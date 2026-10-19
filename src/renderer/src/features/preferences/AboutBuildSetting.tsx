@@ -72,6 +72,42 @@ export function AboutBuildSetting(): JSX.Element {
         the numbers and the cards I want to see while I&rsquo;m playing. May your pulls be
         clean and your loot be kind. — Brujoloco
       </Typography>
+
+      <Box
+        sx={{
+          mt: 1.5,
+          p: 1.5,
+          border: `1px solid ${PALETTE.accent}`,
+          borderRadius: 1,
+          bgcolor: 'transparent'
+        }}
+      >
+        <Typography variant="caption" sx={{ fontWeight: 700, letterSpacing: '0.08em', display: 'block', mb: 0.75 }}>
+          LICENSE &mdash; OPEN, FINAL, FREE TO MODIFY
+        </Typography>
+        <Typography variant="body2" sx={{ fontSize: 13 }}>
+          This build is declared <strong>final</strong> as a delivered product for Linux.
+          Everyone is free to use, copy, modify, fork, and redistribute it under the open license
+          below &mdash; change it as you see fit.
+        </Typography>
+        <Typography variant="body2" sx={{ fontSize: 13, mt: 0.75 }}>
+          The upstream code (EverQuest Companion by Josh Moyers, and the EQ Zera additions by Jack
+          Thomas) is licensed under the <strong>Functional Source License 1.1, MIT future license
+          (FSL-1.1-MIT)</strong>: free for any non-competing use, and it converts to plain MIT two
+          years after each release.
+        </Typography>
+        <Typography variant="body2" sx={{ fontSize: 13, mt: 0.75 }}>
+          The Brujoloco Linux Edition additions since October 2026 &mdash; the AppImage packaging,
+          the theme system, the adaptive light/dark mode, the in-app rebrand, and this About
+          section &mdash; are released under the <strong>MIT License</strong>, copyright
+          &copy; 2026 Brujoloco. You may do anything with them, commercial or not, provided you
+          keep this notice and the upstream attributions in LICENSE and NOTICE.
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.75 }}>
+          See LICENSE for the full FSL-1.1-MIT terms and NOTICE for the third-party and bundled-asset
+          attributions. This is not legal advice; the license text controls.
+        </Typography>
+      </Box>
     </Stack>
   )
 }
