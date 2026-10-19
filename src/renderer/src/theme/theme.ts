@@ -110,7 +110,13 @@ function makeBase(p: ThemePalette): ReturnType<typeof createTheme> {
 const SCROLLBAR_SIZE = 12
 const THUMB_INSET = 3 // 12 - 2*3 => a 6px visible thumb, 3px clear on each side
 
-const scrollbars = {
+// Mode-aware: the thumb is a white tint on a dark theme and a black tint on a light one, so it
+// stays visible against the (palette-derived) track on every theme. The original dark-theme design
+// used a constant white tint, which is invisible on the light themes' light scroll surfaces.
+function scrollbarsFor(b: ReturnType<typeof createTheme>) {
+  const isDark = b.palette.mode === 'dark'
+  const thumbBase = isDark ? b.palette.common.white : b.palette.common.black
+  return {
   // Same size on both axes, so the timeline chart's horizontal bar is treated
   // identically to a vertical list scrollbar.
   '*::-webkit-scrollbar': {
@@ -121,13 +127,13 @@ const scrollbars = {
     background: 'transparent'
   },
   '*::-webkit-scrollbar-thumb': {
-    backgroundColor: alpha(base.palette.common.white, 0.22),
+    backgroundColor: alpha(thumbBase, isDark ? 0.22 : 0.35),
     borderRadius: SCROLLBAR_SIZE,
     border: `${String(THUMB_INSET)}px solid transparent`,
     backgroundClip: 'content-box'
   },
   '*::-webkit-scrollbar-thumb:hover': {
-    backgroundColor: alpha(base.palette.primary.main, 0.55)
+    backgroundColor: alpha(b.palette.primary.main, 0.55)
   },
   '*::-webkit-scrollbar-corner': {
     background: 'transparent'
@@ -146,6 +152,7 @@ const scrollbars = {
   // property that actually fixes the overlap.
   'html, body': {
     scrollbarGutter: 'stable'
+  }
   }
 }
 
@@ -212,7 +219,7 @@ export function makeTheme(p: ThemePalette, neon: string) {
   return createTheme(base, {
   components: {
     MuiCssBaseline: {
-      styleOverrides: { ...ground, ...scrollbars, ...tooltipAnchors }
+      styleOverrides: { ...ground, ...scrollbarsFor(base), ...tooltipAnchors }
     },
     // FLAT SURFACES. No elevation gradients (MUI dark mode paints lighter paper per elevation);
     // a card is navy paper with a hairline the accent tints, and a menu or dialog is the same
