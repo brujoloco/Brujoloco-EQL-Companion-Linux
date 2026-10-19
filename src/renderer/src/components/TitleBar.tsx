@@ -427,22 +427,7 @@ export default function TitleBar({
           textShadow: `0 0 12px ${withAlpha(PALETTE.accent, 0.55)}`
         }}
       >
-        Brujoloco EQL
-      </Typography>
-      <Typography
-        component="span"
-        sx={{
-          fontFamily: FONTS.display,
-          fontWeight: 500,
-          fontSize: 8.5,
-          letterSpacing: '0.14em',
-          color: 'text.secondary',
-          ml: 0.5,
-          alignSelf: 'center',
-          whiteSpace: 'nowrap'
-        }}
-      >
-        Linux Port
+        Brujoloco EQL Companion
       </Typography>
 
       {/* Drag spacer between brand and the right-hand controls. */}
