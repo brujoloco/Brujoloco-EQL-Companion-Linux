@@ -180,20 +180,23 @@ const tooltipAnchors = {
 }
 
 /**
- * THE GROUND. A 28px grid at 4% on the page background — visible as texture where a view leaves
- * navy showing, invisible behind a card. Tabular numerals everywhere, so a column of figures in
- * the body face lines up like the readout face does.
+ * THE GROUND, as a function of the LIVE palette so a theme swap recolours the page background.
+ * A module-scope `const ground` captured PALETTE.bg/accent/magenta at import time (the default
+ * dark theme) and never rebuilt, so the body background stayed the original dark navy on every
+ * theme — the user's 'the background is always the original dark blue background' report.
+ * Reads the palette passed in so makeTheme rebuilds it against the active tokens.
  */
-const ground = {
+function groundFor(p: ThemePalette) {
+  return {
   body: {
-    backgroundColor: PALETTE.bg,
+    backgroundColor: p.bg,
     backgroundImage:
-      `linear-gradient(${withAlpha(PALETTE.accent, 0.045)} 1px, transparent 1px), ` +
-      `linear-gradient(90deg, ${withAlpha(PALETTE.accent, 0.045)} 1px, transparent 1px)`,
+      `linear-gradient(${withAlpha(p.accent, 0.045)} 1px, transparent 1px), ` +
+      `linear-gradient(90deg, ${withAlpha(p.accent, 0.045)} 1px, transparent 1px)`,
     backgroundSize: '28px 28px',
     fontVariantNumeric: 'tabular-nums'
   },
-  '::selection': { backgroundColor: withAlpha(PALETTE.magenta, 0.35) },
+  '::selection': { backgroundColor: withAlpha(p.magenta, 0.35) },
   // TWO UTILITY CLASSES for the card primitive (combatShared.tsx's DashCard), which sits at the
   // max-lines ceiling and cannot afford them as sx: a label in the display face, and a header
   // whose bottom edge carries the accent fading out — a rule with no element.
@@ -205,10 +208,11 @@ const ground = {
     textTransform: 'uppercase'
   },
   '.eq-card-rule': {
-    backgroundImage: `linear-gradient(90deg, ${withAlpha(PALETTE.accent, 0.45)}, transparent 70%)`,
+    backgroundImage: `linear-gradient(90deg, ${withAlpha(p.accent, 0.45)}, transparent 70%)`,
     backgroundSize: '100% 1px',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'bottom'
+  }
   }
 }
 
@@ -219,7 +223,7 @@ export function makeTheme(p: ThemePalette, neon: string) {
   return createTheme(base, {
   components: {
     MuiCssBaseline: {
-      styleOverrides: { ...ground, ...scrollbarsFor(base), ...tooltipAnchors }
+      styleOverrides: { ...groundFor(p), ...scrollbarsFor(base), ...tooltipAnchors }
     },
     // FLAT SURFACES. No elevation gradients (MUI dark mode paints lighter paper per elevation);
     // a card is navy paper with a hairline the accent tints, and a menu or dialog is the same
