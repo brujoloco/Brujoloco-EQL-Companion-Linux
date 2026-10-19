@@ -309,6 +309,60 @@ export const THEMES: ThemeDef[] = [
       accent: '#aaff00', accentHi: '#ccff66', cyan: '#66ff00', cyanDim: '#44aa00',
       green: '#aaff00', amber: '#ddff44', red: '#ff3344', magenta: '#88dd00'
     }
+  },
+  {
+    id: 'brujognome-sky',
+    name: 'BrujoGnome (Soft Sky)',
+    palette: {
+      bg: '#e6f2ff', paper: '#f2f8ff', ink: '#1a3a5c', text: '#1a3a5c',
+      accent: '#2a6fb6', accentHi: '#4a8fd6', cyan: '#3a8ab6', cyanDim: '#2a6a8c',
+      green: '#2a8a4a', amber: '#b67a2a', red: '#b6364a', magenta: '#8a4aa6'
+    }
+  },
+  {
+    id: 'brujognome-blush',
+    name: 'BrujoGnome (Blush Rose)',
+    palette: {
+      bg: '#ffeaf2', paper: '#fff2f7', ink: '#5c1a3a', text: '#5c1a3a',
+      accent: '#b63678', accentHi: '#d66aa0', cyan: '#3a7ab6', cyanDim: '#2a5a8c',
+      green: '#2a8a5a', amber: '#b67a2a', red: '#b6365a', magenta: '#a64a8a'
+    }
+  },
+  {
+    id: 'brujognome-cream',
+    name: 'BrujoGnome (Vanilla Cream)',
+    palette: {
+      bg: '#fff7e6', paper: '#fffbf2', ink: '#5c4a1a', text: '#5c4a1a',
+      accent: '#8a600a', accentHi: '#a67410', cyan: '#2a6a7c', cyanDim: '#1a4a5c',
+      green: '#1a6a1a', amber: '#8a600a', red: '#8a2a1a', magenta: '#6a3a7a'
+    }
+  },
+  {
+    id: 'brujognome-custard',
+    name: 'BrujoGnome (Lemon Custard)',
+    palette: {
+      bg: '#fffce6', paper: '#fffef2', ink: '#5c5410', text: '#5c5410',
+      accent: '#7a7400', accentHi: '#908a10', cyan: '#1a6a6c', cyanDim: '#0a4a4c',
+      green: '#3a6a1a', amber: '#7a7400', red: '#8a2a1a', magenta: '#5a3a7a'
+    }
+  },
+  {
+    id: 'brujognome-sage',
+    name: 'BrujoGnome (Soft Sage)',
+    palette: {
+      bg: '#eaf6ec', paper: '#f2faf4', ink: '#1a4c24', text: '#1a4c24',
+      accent: '#1a7a2a', accentHi: '#2a8a3a', cyan: '#1a7a7c', cyanDim: '#0a5a5c',
+      green: '#1a6a1a', amber: '#8a600a', red: '#a62a2a', magenta: '#6a3a7a'
+    }
+  },
+  {
+    id: 'brujognome-lilac',
+    name: 'BrujoGnome (Lilac Mist)',
+    palette: {
+      bg: '#f2eaff', paper: '#f8f2ff', ink: '#3a1a5c', text: '#3a1a5c',
+      accent: '#7a4ab6', accentHi: '#9c6ad6', cyan: '#3a6ab6', cyanDim: '#2a4a8c',
+      green: '#2a7a4a', amber: '#a6742a', red: '#b6365a', magenta: '#7a4aa6'
+    }
   }
 ]
 
