@@ -56,7 +56,6 @@ import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
 import { fitChanged, overlayFitRequest } from './overlayFit'
 import { PALETTE, withAlpha } from '../../../shared/palette'
 
-const ACCENT = PALETTE.accent
 
 /** WHAT THE FRAME SAYS (2026-09-10) — the toast's rule, one window over: name what the rectangle
  *  IS before describing the drag, and name the button that ends it. */
@@ -107,9 +106,9 @@ function DragFrame({
         marginBottom: 8,
         padding: '6px 10px',
         borderRadius: 8,
-        border: `1px dashed ${ACCENT}`,
+        border: `1px dashed ${PALETTE.accent}`,
         background: withAlpha(PALETTE.bg, 0.65),
-        color: ACCENT,
+        color: PALETTE.accent,
         fontSize: 11
       }}
     >
@@ -126,10 +125,10 @@ function DragFrame({
         style={{
           ...noDrag,
           flexShrink: 0,
-          border: `1px solid ${ACCENT}`,
+          border: `1px solid ${PALETTE.accent}`,
           borderRadius: 4,
           background: 'transparent',
-          color: ACCENT,
+          color: PALETTE.accent,
           fontSize: 11,
           padding: '2px 8px',
           cursor: 'pointer'

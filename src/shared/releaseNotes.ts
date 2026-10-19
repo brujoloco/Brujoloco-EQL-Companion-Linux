@@ -186,6 +186,10 @@ export const RELEASE_NOTES: readonly ReleaseNote[] = [
       },
       {
         kind: 'new',
+        text: 'The floating overlays now follow the main theme. Every overlay window (zone meter, fight meter, fight healing, zone healing, event log, buffs, debuffs, xp, respawn, farm meter, run tracker, mob card on /con) is its own renderer process, so it kept the default bluish palette no matter which theme the main window was in. The theme now rides onto them: the overlay preload exposes themeGet + onTheme, the main process broadcasts the theme id to every open overlay on a change and seeds a late-opened one on mount, and the overlay root is wrapped in the app’s MUI ThemeProvider so a live swap recolours it. The overlay components’ module-scope colour captures were converted to live PALETTE reads, and the opaque overlays’ native background is read live too — so a theme change recolours every overlay, with no restart.'
+      },
+      {
+        kind: 'new',
         text: 'Preferences → About this build: a new section directly above Thanks, naming the build and its origin, declaring it final for Linux, and disclosing the open license — upstream code under FSL-1.1-MIT, the Brujoloco Linux Edition additions under MIT.'
       }
     ]

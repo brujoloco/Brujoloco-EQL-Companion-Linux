@@ -63,7 +63,6 @@ import { PALETTE, withAlpha } from '../../../shared/palette'
 
 const MUTED = '#a8b0c6'
 const DIM = '#7c8397'
-const ACCENT = PALETTE.accent
 const BUTTON_PX = 20
 
 /**
@@ -133,7 +132,7 @@ function Identity({ payload, linked }: { payload: ConCardPayload; linked: boolea
           ...(linked
             ? {
                 textDecoration: 'underline',
-                textDecorationColor: `${ACCENT}88`,
+                textDecorationColor: `${PALETTE.accent}88`,
                 textDecorationThickness: 1,
                 textUnderlineOffset: 3
               }
@@ -343,7 +342,7 @@ export function ConCard({
         gap: 6,
         padding: '8px 10px',
         borderRadius: 8,
-        border: `1px solid ${ACCENT}55`,
+        border: `1px solid ${PALETTE.accent}55`,
         background: withAlpha(PALETTE.bg, String(bgAlpha)),
         backdropFilter: 'blur(6px)',
         boxShadow: '0 6px 18px rgba(0,0,0,0.45)',

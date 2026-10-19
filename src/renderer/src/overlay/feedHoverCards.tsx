@@ -30,7 +30,6 @@ const ItemWindow = lazy(() =>
 )
 
 /** This card's own accent. The rest of the palette is the shared card vocabulary in lib/. */
-const ACCENT = PALETTE.accent
 /** How many quest uses / recipes the card lists before collapsing to "+N more". */
 const MAX_LISTED = 4
 
@@ -195,7 +194,7 @@ export function ItemHoverCard({ item, stats }: { item: string; stats?: string })
       data-item={item}
       style={{
         background: 'rgba(15,16,23,0.98)',
-        border: `1px solid ${ACCENT}`,
+        border: `1px solid ${PALETTE.accent}`,
         borderRadius: 6,
         padding: 8,
         maxWidth: 300,

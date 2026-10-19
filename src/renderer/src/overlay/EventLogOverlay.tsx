@@ -52,7 +52,6 @@ import { useOverlayChrome, type OverlayChrome } from './useOverlayChrome'
 import { OverlayHeader } from './OverlayHeader'
 import { PALETTE, withAlpha } from '../../../shared/palette'
 
-const ACCENT = PALETTE.accent
 
 /** Per-kind accent + glyph. Colors match the app's semantics (alerts violet — the app accent —
  *  loot cyan, quest green, consider amber — a hue none of the other three uses, so a con row is identifiable at a glance
@@ -65,7 +64,7 @@ const KIND_STYLE: Record<FeedEvent['kind'], { color: string; glyph: string }> = 
 }
 
 /**
- * A con row's ACCENT is the faction rung's color, not the kind's — the whole point of a consider
+ * A con row's PALETTE.accent is the faction rung's color, not the kind's — the whole point of a consider
  * is "how does this thing feel about me", so the row's left edge and headline say it before you
  * read a word. The violet kind color stays on the glyph, so the row is still recognizably a con.
  */
@@ -393,7 +392,7 @@ function FeedFooter({
         step={0.02}
         value={bgAlpha}
         onChange={(e) => patch({ bgAlpha: Number(e.target.value) })}
-        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: ACCENT, height: 4 }}
+        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: PALETTE.accent, height: 4 }}
       />
       <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
     </div>
@@ -432,7 +431,7 @@ export default function EventLogOverlay(): JSX.Element {
       <OverlayHeader
         tag="EVENTS"
         title="Event log"
-        titleColor={ACCENT}
+        titleColor={PALETTE.accent}
         tail={String(feed.length)}
         tailColor="rgba(255,255,255,0.5)"
         chrome={{ locked, hovering, dragRegion, noDrag, toggleLock }}

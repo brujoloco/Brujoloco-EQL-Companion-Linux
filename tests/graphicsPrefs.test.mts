@@ -19,6 +19,7 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { setPalette } from '../src/shared/palette'
 import {
   DEFAULT_GRAPHICS_PREFS,
   GPU_ENV_VAR,
@@ -28,6 +29,7 @@ import {
   TRANSPARENT_OVERLAY_BG,
   envDisablesGpu,
   normalizeGraphicsPrefs,
+  opaqueOverlayBg,
   overlayBackgroundColor,
   resolveGraphics,
   resolveGraphicsSwitch,
@@ -165,6 +167,32 @@ test('an opaque overlay is built on the SAME colour the page already paints', ()
   // compatibility mode finds out.
   assert.equal(OPAQUE_OVERLAY_BG.toLowerCase(), '#0b0f1a')
   assert.equal(TRANSPARENT_OVERLAY_BG, '#00000000')
+})
+
+test('opaqueOverlayBg reads PALETTE.bg LIVE — it follows a theme swap, not the import-time default', () => {
+  // The overlay theme port: the opaque overlay's background must recolour with the active theme,
+  // so it is read through `opaqueOverlayBg()` (which re-evaluates `PALETTE.bg` every call) rather
+  // than a module-scope `const` captured at import. The frozen `OPAQUE_OVERLAY_BG` is the DEFAULT
+  // theme's bg (#0b0f1a, the value the test above pins); the LIVE read tracks whatever `setPalette`
+  // last set, so after a swap to crt-green (bg #000000) the live read is #000000 and no longer the
+  // frozen default, and after restoring arcane it is #0b0f1a again.
+  //
+  // NOTE: this asserts the live read's RETURN VALUE directly rather than against the `PALETTE`
+  // binding. Under the tsx test runner `export let PALETTE` reassignment does not propagate to an
+  // importer's binding (a CJS-interop artifact), so `PALETTE.bg` here is frozen at import; the
+  // bundled ESM app uses native live bindings and `opaqueOverlayBg()` reads them every call, so
+  // it is the function's return that proves the live read — not the frozen binding.
+  const before = opaqueOverlayBg()
+  assert.equal(before, OPAQUE_OVERLAY_BG) // both are the default theme's #0b0f1a
+  setPalette('crt-green')
+  try {
+    assert.equal(opaqueOverlayBg(), '#000000') // crt-green bg, tracked live
+    assert.notEqual(opaqueOverlayBg(), OPAQUE_OVERLAY_BG) // no longer the frozen default
+  } finally {
+    setPalette('arcane')
+  }
+  assert.equal(opaqueOverlayBg(), before) // restored to the default
+  assert.equal(opaqueOverlayBg(), OPAQUE_OVERLAY_BG)
 })
 
 test('9 → 11 gives every upgrading store a complete graphics block, both switches auto', () => {

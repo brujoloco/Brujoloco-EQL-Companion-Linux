@@ -64,7 +64,6 @@ import { type OverlayChrome, useOverlayChrome } from './useOverlayChrome'
 import { BuffTimerGroup } from './buffTimerBars'
 import { PALETTE, withAlpha } from '../../../shared/palette'
 
-const ACCENT = PALETTE.accent
 /** The debuff accent, and deliberately the same red `buffTimerBars.rowAccent` already gives a
  *  debuff row — two windows that look alike at a glance would be worse than one. */
 const RED = '#e07a6a'
@@ -106,7 +105,7 @@ const SURFACE: Record<
   buffs: {
     tag: 'BUFFS',
     title: 'Buffs',
-    accent: ACCENT,
+    accent: PALETTE.accent,
     tailTitle: 'Buffs you have running',
     selfLabel: 'Your buffs',
     empty: 'Watching for buffs you cast…',

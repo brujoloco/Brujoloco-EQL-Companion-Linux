@@ -48,7 +48,6 @@ import { TOAST_ENTER_MS, TOAST_EXIT_MS } from './toastQueue'
 import { ToastQuestBlock } from './ToastQuestBlock'
 import { PALETTE, withAlpha } from '../../../shared/palette'
 
-const ACCENT = PALETTE.accent
 const MUTED = '#a8b0c6'
 const ITEM_GREEN = '#5fe08a'
 const MONO = '"Consolas","Courier New",monospace'
@@ -76,7 +75,7 @@ function openQuestIndex(quests: ToastQuestCard[]): number {
 
 /** The name colour the payload's hint asks for. Unknown/absent ⇒ the ordinary item green. */
 function nameColor(flag: string | undefined): string {
-  return flag === 'lore' || flag === 'magic' ? ACCENT : ITEM_GREEN
+  return flag === 'lore' || flag === 'magic' ? PALETTE.accent : ITEM_GREEN
 }
 
 /** Item icons come from the app's PERMANENT cache (`eqimg://`), never the network — the
@@ -140,9 +139,9 @@ function CardChrome({ onDismiss }: { onDismiss: () => void }): JSX.Element {
           lineHeight: '18px',
           padding: 0,
           borderRadius: 4,
-          border: `1px solid ${hot ? ACCENT : 'rgba(255,255,255,0.18)'}`,
+          border: `1px solid ${hot ? PALETTE.accent : 'rgba(255,255,255,0.18)'}`,
           background: hot ? withAlpha(PALETTE.accent, 0.16) : 'transparent',
-          color: hot ? ACCENT : MUTED,
+          color: hot ? PALETTE.accent : MUTED,
           fontSize: 13,
           cursor: 'pointer'
         }}
@@ -177,10 +176,10 @@ function IntroBlock(): JSX.Element {
         onMouseLeave={() => setHot(false)}
         style={{
           marginTop: 10,
-          border: `1px solid ${hot ? ACCENT : withAlpha(PALETTE.accent, 0.45)}`,
+          border: `1px solid ${hot ? PALETTE.accent : withAlpha(PALETTE.accent, 0.45)}`,
           borderRadius: 4,
           background: hot ? withAlpha(PALETTE.accent, 0.16) : 'transparent',
-          color: ACCENT,
+          color: PALETTE.accent,
           fontSize: 12,
           padding: '4px 10px',
           cursor: 'pointer'
@@ -225,10 +224,10 @@ function CardAction({ label, onClick }: { label: string; onClick: () => void }):
         onMouseEnter={() => setHot(true)}
         onMouseLeave={() => setHot(false)}
         style={{
-          border: `1px solid ${hot ? ACCENT : withAlpha(PALETTE.accent, 0.45)}`,
+          border: `1px solid ${hot ? PALETTE.accent : withAlpha(PALETTE.accent, 0.45)}`,
           borderRadius: 4,
           background: hot ? withAlpha(PALETTE.accent, 0.16) : 'transparent',
-          color: ACCENT,
+          color: PALETTE.accent,
           fontSize: 12,
           padding: '3px 10px',
           cursor: 'pointer'
@@ -254,7 +253,7 @@ function RewardBlock({ item, onClick }: { item: ToastItemCard; onClick?: () => v
         marginTop: 10,
         padding: 8,
         borderRadius: 8,
-        border: `1px solid ${hot && clickable ? ACCENT : 'rgba(255,255,255,0.10)'}`,
+        border: `1px solid ${hot && clickable ? PALETTE.accent : 'rgba(255,255,255,0.10)'}`,
         background: 'rgba(255,255,255,0.04)',
         cursor: clickable ? 'pointer' : 'default'
       }}
@@ -374,7 +373,7 @@ export function ToastCard({
       }}
     >
       <CardChrome onDismiss={onDismiss} />
-      <div data-testid="toast-title" style={{ color: ACCENT, fontSize: 18, fontWeight: 700, lineHeight: 1.3 }}>
+      <div data-testid="toast-title" style={{ color: PALETTE.accent, fontSize: 18, fontWeight: 700, lineHeight: 1.3 }}>
         {payload.title}
       </div>
       {payload.subtitle && (

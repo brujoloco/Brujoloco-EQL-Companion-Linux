@@ -40,7 +40,6 @@ import { PALETTE } from '../../../shared/palette'
  * from `KIND_COLOR.you` below: the two happen to be the same hue and mean different things, and
  * the aggregate is the one number on this surface that is emphatically NOT yours.
  */
-const ACCENT = PALETTE.accent
 
 const KIND_COLOR: Record<string, string> = {
   you: PALETTE.accent,
@@ -394,7 +393,7 @@ export function MeterBars({
   // THE AGGREGATE THE TITLE BAR USED TO CARRY (JOS-158) — the same `SegmentView.outDps`, moved
   // rather than recomputed, so the number a pinned meter shows did not change on the day its
   // label appeared. The crumb states what it covers; see overlay/meterCrumb.tsx.
-  const total: CrumbTotal = { text: formatRate(seg.outDps), accent: ACCENT }
+  const total: CrumbTotal = { text: formatRate(seg.outDps), accent: PALETTE.accent }
 
   if (panel.level !== 1)
     return <DrilledBars panel={panel} activeSec={seg.activeSec} dur={dur} total={total} setDrill={setDrill} />

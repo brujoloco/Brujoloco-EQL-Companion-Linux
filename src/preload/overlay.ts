@@ -52,6 +52,19 @@ const KIND: OverlayKind = readKind()
 const overlayApi = {
   /** This overlay window's kind ('fight' | 'overall' | 'events'). */
   kind: KIND,
+  /** The persisted app theme id (THE SAME one the main window's Preferences picker sets),
+   *  validated + defaulted by main. An overlay self-seeds its palette from this on mount so the
+   *  very first paint is already the user's choice, then re-swaps on every `onTheme` push so a
+   *  live change in the main window reaches every open overlay (overlay/main.tsx). */
+  themeGet: (): Promise<string> => ipcRenderer.invoke(IPC.themeGet),
+  /** "The user changed the theme in the main window" — main broadcasts the new id to every open
+   *  overlay so each swaps its OWN bundle's palette to match. The overlay renderer's `applyTheme`
+   *  does the swap + the version-counter bump that forces the re-render (useTheme.ts). */
+  onTheme: (cb: (id: string) => void): (() => void) => {
+    const listener = (_e: unknown, id: string): void => cb(id)
+    ipcRenderer.on(IPC.onTheme, listener)
+    return () => ipcRenderer.removeListener(IPC.onTheme, listener)
+  },
   /** Fetch a fresh combat snapshot (same engine + IPC the main app polls). */
   getCombatSnapshot: (opts: SnapshotOpts): Promise<CombatSnapshot> =>
     ipcRenderer.invoke(IPC.getCombatSnapshot, opts),

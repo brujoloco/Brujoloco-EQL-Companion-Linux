@@ -1225,8 +1225,14 @@ export const IPC = {
   // the id on mount; main -> renderer: the stored id (validated; default "arcane" on a fresh or
   // unknown store). set: store + apply to the main process's palette in the same call. The
   // renderer applies its own palette swap via useTheme, which also rebuilds the MUI theme.
+  //
+  // onTheme is the BROADCAST half (theme follows onto the overlays): main -> every open overlay
+  // window whenever the id changes, so each overlay's OWN bundle swaps its palette to match. The
+  // overlay preload exposes this as `window.eqOverlay.onTheme`; the overlay renderer self-seeds
+  // on mount via `themeGet` and re-swaps on every push (overlay/main.tsx).
   themeGet: 'theme:get',
   themeSet: 'theme:set',
+  onTheme: 'theme:changed',
 
   // ---- dev restart (JOS-61, JOS-63 — src/main/devRestart.ts) ----------------------------
   //

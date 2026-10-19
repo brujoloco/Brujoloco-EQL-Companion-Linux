@@ -205,7 +205,19 @@ export const TRANSPARENT_OVERLAY_BG = '#00000000'
  */
 export const OPAQUE_OVERLAY_BG: string = PALETTE.bg
 
+/**
+ * The LIVE read of the same colour — `PALETTE.bg` re-evaluated every call so an opaque overlay
+ * re-paints in the CURRENT theme's background when the theme changes, rather than the one this
+ * module happened to import under. The main process's `setPalette` reassigns `PALETTE` before
+ * this is consulted on a theme broadcast (ipc/theme.ts), so the colour is the new theme's. The
+ * frozen `OPAQUE_OVERLAY_BG` above stays as the DEFAULT theme's reference value (the one the
+ * compat tests pin), and this is what the runtime actually paints with.
+ */
+export function opaqueOverlayBg(): string {
+  return PALETTE.bg
+}
+
 /** The `backgroundColor` an overlay window is constructed with, given the switch. */
 export function overlayBackgroundColor(opaque: boolean): string {
-  return opaque ? OPAQUE_OVERLAY_BG : TRANSPARENT_OVERLAY_BG
+  return opaque ? opaqueOverlayBg() : TRANSPARENT_OVERLAY_BG
 }

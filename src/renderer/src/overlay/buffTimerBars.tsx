@@ -17,16 +17,14 @@ import { type BuffTimerRow, rowRankLabel, timerReading } from '@shared/buffTimer
 import { fmtDuration } from '../features/buffs/format'
 import { PALETTE } from '../../../shared/palette'
 
-const ACCENT = PALETTE.accent
 /** A debuff you put on something else reads red — never confusable with your own buff (law 4's
  *  presentation rule, and the same split `features/buffs/format.ts classAccent` makes). */
 const RED = '#e07a6a'
 /** Crowd control is its own colour: a mez is not a damage debuff, and a player chain-mezzing
  *  four enemies needs to find those four rows at a glance. */
-const AMBER = PALETTE.amber
 
 export function rowAccent(kind: BuffTimerRow['kind']): string {
-  return kind === 'cc' ? AMBER : kind === 'debuff' ? RED : ACCENT
+  return kind === 'cc' ? PALETTE.amber : kind === 'debuff' ? RED : PALETTE.accent
 }
 
 /** What the right-hand column says. The `+` is load-bearing: it is how a reader tells a count-up

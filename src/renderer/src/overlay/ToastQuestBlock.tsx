@@ -37,7 +37,6 @@ import { type JSX, useState } from 'react'
 import type { ToastQuestCard } from '@shared/toast'
 import { PALETTE, withAlpha } from '../../../shared/palette'
 
-const ACCENT = PALETTE.accent
 const MUTED = '#a8b0c6'
 const MONO = '"Consolas","Courier New",monospace'
 
@@ -96,7 +95,7 @@ function QuestHead({ card }: { card: ToastQuestCard }): JSX.Element {
     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 }}>
       <span
         data-testid="toast-quest-name"
-        style={{ color: ACCENT, fontSize: 14, fontWeight: 700, minWidth: 0 }}
+        style={{ color: PALETTE.accent, fontSize: 14, fontWeight: 700, minWidth: 0 }}
       >
         {card.name}
       </span>
@@ -183,7 +182,7 @@ export function ToastQuestBlock({ card, expanded }: { card: ToastQuestCard; expa
         marginTop: 10,
         padding: 8,
         borderRadius: 8,
-        border: `1px solid ${hot ? ACCENT : 'rgba(255,255,255,0.10)'}`,
+        border: `1px solid ${hot ? PALETTE.accent : 'rgba(255,255,255,0.10)'}`,
         background: 'rgba(255,255,255,0.04)',
         cursor: 'pointer'
       }}

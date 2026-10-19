@@ -26,7 +26,6 @@ import type { OverlayChrome } from './useOverlayChrome'
 import { PALETTE } from '../../../shared/palette'
 
 /** The frame's accent, restated here because this bundle has no theme to import one from. */
-const ACCENT = PALETTE.accent
 
 export function BgAlphaSlider({
   bgAlpha,
@@ -54,7 +53,7 @@ export function BgAlphaSlider({
         step={BG_ALPHA_STEP}
         value={bgAlpha}
         onChange={(e) => { patch({ bgAlpha: Number(e.target.value) }) }}
-        style={{ width: 64, flexShrink: 0, accentColor: ACCENT, height: 4 }}
+        style={{ width: 64, flexShrink: 0, accentColor: PALETTE.accent, height: 4 }}
       />
     </span>
   )

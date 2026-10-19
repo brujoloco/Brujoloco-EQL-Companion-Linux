@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import OverlayMeter from './OverlayMeter'
 import EventLogOverlay from './EventLogOverlay'
@@ -14,12 +14,19 @@ import RunOverlay from './RunOverlay'
 import { isHealOverlayKind } from '@shared/types'
 import { isTimerOverlayKind } from '@shared/buffTimers'
 import { installOverlayPointerExit } from './pointerExit'
+import { ThemeProvider } from '@mui/material/styles'
+import { useTheme, applyTheme } from '../theme/useTheme'
 
 // The overlay renders in its OWN transparent BrowserWindow (Task #52). It is a
-// standalone React root — deliberately NOT wrapped in the app's MUI ThemeProvider
-// or ErrorBoundary. Every surface here is a tiny, dependency-light component (plain
-// divs + inline styles) so it stays cheap to paint on top of the game and has no
-// reason to pull the whole MUI/theme surface into a second window bundle.
+// standalone React root, but IT IS NOW WRAPPED in the app's MUI ThemeProvider so the
+// theme the user picks in Preferences follows onto every overlay (the overlay follows the
+// main theme: theme follows onto overlays). The overlay self-seeds its palette from the
+// persisted id on mount (`window.eqOverlay.themeGet`) and re-swaps on every `onTheme`
+// broadcast (`applyTheme` bumps the version counter, `useTheme` rebuilds the MUI theme
+// and re-renders the whole tree so every `PALETTE.x` read picks up the new tokens). The
+// overlay components read `PALETTE.x` live (no module-scope captures) so a swap recolours
+// them; the ThemeProvider does the same for the MUI-resolved `sx` palette. There is still
+// no ErrorBoundary — the surfaces are tiny and dependency-light.
 //
 // ONE bundle serves every overlay KIND; which component mounts is decided by the
 // `?kind=` query the window was opened with (read + validated by the preload):
@@ -67,6 +74,23 @@ function Surface(): React.JSX.Element {
   return <OverlayMeter />
 }
 
+// The overlay's themed root: subscribe to the theme-version counter (so a swap re-renders the
+// whole tree), seed this bundle's palette from the persisted id on mount, and ride `onTheme`
+// for live changes made in the main window. `window.eqOverlay` is the overlay's LEAN bridge
+// (preload/overlay.ts); `window.eq` is absent here, so `useTheme`'s own mount effect no-ops and
+// the seeding is done here instead.
+function ThemedSurface(): React.JSX.Element {
+  const { theme } = useTheme() // useThemeVersion() inside — re-renders on applyTheme's bump
+  useEffect(() => {
+    let alive = true
+    const off = window.eqOverlay?.onTheme?.((id: string) => { if (alive) applyTheme(id) })
+    void window.eqOverlay?.themeGet?.().then((id: string) => { if (alive && id) applyTheme(id) }).catch(() => { /* store read best-effort */ })
+    return () => { alive = false; off?.() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only: seed + subscribe once
+  }, [])
+  return <ThemeProvider theme={theme}><Surface /></ThemeProvider>
+}
+
 // EVERY KIND GETS THE ORPHAN GUARD (JOS-358). A native tooltip that outlives the pointer sits on
 // top of the GAME, and a click-through window has nothing left to un-hover it — so the dismissal
 // is installed here, once, for whichever surface mounts below. See overlay/pointerExit.ts for
@@ -80,6 +104,6 @@ if (!container) throw new Error('overlay: #overlay-root container missing from o
 
 ReactDOM.createRoot(container).render(
   <React.StrictMode>
-    <Surface />
+    <ThemedSurface />
   </React.StrictMode>
 )

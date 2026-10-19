@@ -20,7 +20,6 @@ import { EMPTY_ROSTER, chipLabel } from '@shared/roster'
 import { PALETTE, withAlpha } from '../../../shared/palette'
 
 // Palette (matches the app's combat colors; the overlay has no MUI theme).
-const ACCENT = PALETTE.accent
 
 /** The "head row" sentinel — one definition, shared with the main view (dashboardData). */
 const LIVE = LIVE_SELECTION
@@ -293,13 +292,13 @@ export default function OverlayMeter(): JSX.Element {
         tag={isFight ? 'FIGHT' : 'ZONE'}
         last={headIsLast}
         title={headerName}
-        titleColor={ACCENT}
+        titleColor={PALETTE.accent}
         // THE FIGHT'S NAME, AND NOTHING ELSE (owner direction 2026-08-09 — JOS-158). JOS-35 had
         // already sent the fight CLOCK down to the crumb row above the bars; the RATE has now
         // followed it (overlay/meterCrumb.tsx), where it can be labelled for what it covers
         // instead of floating unlabelled beside a mob name. So this header passes NO tail at all,
         // and every pixel it was holding is width a long mob name gets to use at 380px.
-        select={{ rows, value: selection, onChange: selectSegment, accent: ACCENT }}
+        select={{ rows, value: selection, onChange: selectSegment, accent: PALETTE.accent }}
         // The kind's own controls beside the lock/close pair: Share on both meters (2026-09-11),
         // and "New session" on the ZONE kind only (JOS-322). The list is ordered so the one every
         // meter has sits nearest the lock, and the zone-only one is what a narrow window loses
@@ -383,7 +382,7 @@ function MeterFooter({
         step={0.02}
         value={bgAlpha}
         onChange={(e) => patch({ bgAlpha: Number(e.target.value) })}
-        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: ACCENT, height: 4 }}
+        style={{ flexGrow: 1, flexShrink: 1, flexBasis: 0, minWidth: 24, accentColor: PALETTE.accent, height: 4 }}
       />
       <TextScaleStepper textScale={textScale} patch={patch} noDrag={noDrag} />
     </div>
