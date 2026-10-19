@@ -139,6 +139,9 @@ import { whatsNewSection } from '../whatsnew/WhatsNewPanel'
 // Same arrangement again (JOS-198): the credit for the bundled wiki art names its own section
 // beside the card that renders it. See ./ThanksSetting.tsx for why it is a section at all.
 import { thanksSection } from './ThanksSetting'
+// The build's own credit (Brujoloco EQL Companion, Linux Edition) — names this build and the
+// human reason it exists. Sits directly above the Thanks section in the rail.
+import { aboutBuildSection } from './AboutBuildSetting'
 // Same arrangement again (owner, 2026-09-10): where your character card gets posted - today one
 // Discord channel webhook - names its own section beside the card that renders it.
 import { sharingSection } from './SharingSetting'
@@ -438,6 +441,10 @@ function buildSections({ version, status, onSendFeedback, onWhatsNew }: SectionI
         }
       ]
     },
+    // DIRECTLY ABOVE the Thanks section, and that is where a build's own credit belongs:
+    // it names THIS build (the Linux Edition rework) and the human reason it exists, rather
+    // than the third-party credits the Thanks section below it carries (JOS-198).
+    aboutBuildSection(),
     // LAST in the rail, and that is where a credit belongs: it is the thing you go looking for
     // rather than the thing you land on. Never above the controls a user opened Preferences to
     // change (JOS-198).
