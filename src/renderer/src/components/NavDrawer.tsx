@@ -292,8 +292,12 @@ export default function NavDrawer({
         <Divider />
         <List disablePadding>
           {/* Send feedback (Task #65): a dialog, so it is a plain action row — no `selected`
-              state to own, because nothing in the nav stays "on" while it is open. */}
-          <ListItemButton data-testid="nav-feedback" onClick={onSendFeedback} sx={CELL_SX}>
+              state to own, because nothing in the nav stays "on" while it is open.
+              BRUJOLOCO LINUX EDITION: the upstream eq-zera feedback server is not compatible
+              with this build, so the row is disabled (no-op) rather than opening a dialog that
+              cannot submit. Restore the `onClick={onSendFeedback}` and drop `disabled` to
+              re-enable against a compatible endpoint. */}
+          <ListItemButton data-testid="nav-feedback" disabled onClick={() => {}} sx={CELL_SX}>
             <ListItemIcon>
               <FeedbackMark />
             </ListItemIcon>

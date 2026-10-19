@@ -17,6 +17,11 @@ import type { FeedbackPrefill } from '../feedback/useFeedback'
 export type OpenFeedback = (prefill?: FeedbackPrefill) => void
 
 export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Element {
+  // BRUJOLOCO LINUX EDITION: the in-app feedback endpoint (upstream eq-zera feedback server)
+  // is not available for this build, so the buttons are disabled rather than wired to a
+  // server that cannot receive them. Flip `disabled` off (and restore the `onClick` handlers)
+  // to re-enable against a compatible endpoint.
+  const disabled = true
   return (
     <Stack spacing={1}>
       <Stack direction="row" spacing={1} flexWrap="wrap">
@@ -25,7 +30,8 @@ export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Eleme
           variant="outlined"
           startIcon={<LightbulbIcon />}
           data-testid="prefs-feedback-feature"
-          onClick={() => onSend({ type: 'feature' })}
+          disabled={disabled}
+          onClick={() => { if (!disabled) onSend({ type: 'feature' }) }}
         >
           Request a feature
         </Button>
@@ -34,14 +40,14 @@ export function FeedbackSetting({ onSend }: { onSend: OpenFeedback }): JSX.Eleme
           variant="outlined"
           startIcon={<BugReportIcon />}
           data-testid="prefs-feedback-bug"
-          onClick={() => onSend({ type: 'bug' })}
+          disabled={disabled}
+          onClick={() => { if (!disabled) onSend({ type: 'bug' }) }}
         >
           Report a problem
         </Button>
       </Stack>
       <Typography variant="caption" color="text.secondary">
-        A bug report can attach a scrubbed slice of your EverQuest log - chat, tells, group and
-        /who lines are removed, and you read every line that remains before it leaves the machine.
+        Feedback is disabled in this build. File issues on the project&rsquo;s repository instead.
       </Typography>
     </Stack>
   )

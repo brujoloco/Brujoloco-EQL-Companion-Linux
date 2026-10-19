@@ -85,8 +85,11 @@ export function VersionSetting({
  * so updateChipState demotes it to 'quiet' and we must not claim "update ready").
  */
 function chipLook(status: UpdateStatus, ui: UpdateChipState): ChipLook {
-  // Dev build: the updater is off, so "up to date" would be a claim no check ever made.
-  if (status.disabled) return { label: 'dev build - updates off', color: 'default' }
+  // Dev build, OR this Linux Edition with updates intentionally off: "up to date" would be a
+  // claim no check ever made, so say so. The Brujoloco build flips autoUpdateDisabled() true
+  // (the upstream eq-zera feed is not compatible with this build), so this label is what a
+  // release user sees too.
+  if (status.disabled) return { label: 'updates off (this build)', color: 'default' }
   if (ui.kind === 'quiet' && status.state === 'ready') return STATE_CHIP.idle
   return STATE_CHIP[status.state]
 }

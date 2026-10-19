@@ -680,7 +680,15 @@ function registerUpdaterEvents(
  * `npm run dev` is never packaged, so the machinery is skipped there either way.
  */
 function autoUpdateDisabled(): boolean {
-  return false
+  // BRUJOLOCO LINUX EDITION: auto-update is intentionally DISABLED in this build.
+  // The upstream feed (this fork's GitHub Releases under the eq-zera publisher) is not
+  // compatible with this Linux Edition, so checking it would either 404 or offer a
+  // Windows-only build that cannot apply here. Flip this back to `false` to re-enable the
+  // updater against a compatible feed. The IPC surface stays registered (the renderer never
+  // has to special-case it): checkForUpdates returns a disabled status, the Updates chip
+  // reads "updates off", and the manual "Check for updates" button stays disabled — no
+  // network call is ever made to the upstream feed.
+  return true
 }
 const AUTO_UPDATE_DISABLED = autoUpdateDisabled()
 
