@@ -27,14 +27,10 @@ fork of [everquest-companion](https://github.com/jmoyers/everquest-companion) ("
 Companion") by Josh Moyers. I reworked it for my own Linux box — a native AppImage instead of a
 Windows installer — and added a few things on top. 🐧→📦
 
-The upstream README is preserved as [`README.upstream.md`](README.upstream.md), and
-[`AGENTS.md`](AGENTS.md) is still the best map of the code.
-
 ## 🔨 Building
 
 See [`BUILD.md`](BUILD.md) for the complete build guide (Node v24, Rust 1.98.0, the full
-`npm ci` → `build:engine` → `build` → `electron-builder --linux AppImage` pipeline). Feature
-plans are in [`ROADMAP.md`](ROADMAP.md).
+`npm ci` → `build:engine` → `build` → `electron-builder --linux AppImage` pipeline).
 
 ## 📜 License
 
