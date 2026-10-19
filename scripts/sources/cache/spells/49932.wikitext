@@ -1,0 +1,39 @@
+{{Spellpage|
+
+| spellname = Word of Souls
+| spellicon = C
+| description = A forbidden word that causes between 138 and 155 damage to all nearby enemies.
+
+| classes = 
+
+* [[Necromancer]] - Level 36
+* [[Cleric]] - Level 39
+
+| slots = 
+
+{{SpellSlotRow | 1 | Decrease Hitpoints by 147 (L39) to 155 (L42) }}
+
+| skill = [[Skill Evocation | Evocation]]
+
+| mana = 171
+| range =  
+| casting_time = 4.60
+| fizzle_time = 2.50
+| recast_time = 9.00
+| duration = Instant
+| target_type = PB AE
+| spell_type = Detrimental
+| resist = Magic (0)
+
+| msg_cast_on_you = You are wracked with pain.
+| msg_cast_on_other = Someone  writhes in pain.
+| msg_wears_off =  
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+</ul>
+
+}}

@@ -1,0 +1,54 @@
+{{Classic Era}}
+{{disambig3|[[Fear (effect)]]}}
+{{Spellpage|
+
+| spellname = Fear
+| spellicon = G
+| description = A booming voice fills your target's ears, causing them to flee in terror.
+
+| classes = 
+
+* [[Cleric]] - Level 6
+* [[Shadow Knight]] - Level 12
+* [[Necromancer]] - Level 2
+* [[Enchanter]] - Level 3
+
+| items_with_effect = 
+
+<ul><li> {{:Blood Ember Boots}}
+</li><li> {{:Terror Forged Mask}}
+</li><li> {{:Jagged Shard of Bone}}
+</li></ul>
+
+| slots = 
+
+{{SpellSlotRow | 1 | Fear(1) }}
+
+| skill = [[Skill Alteration | Alteration]]
+
+| mana = 40
+| range = 200
+| casting_time = 3.50
+| fizzle_time = 1.5
+| recast_time = 7.00
+| duration = 18 seconds
+| target_type = Single
+| spell_type = Detrimental
+| resist = Magic (0)
+
+| other = 
+
+| msg_cast_on_you = Your mind fills with fear.
+| msg_cast_on_other = Someone  looks very afraid.
+| msg_wears_off = You are no longer afraid.
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Enchanter#Spell Vendors|Enchanter Spell Vendors]]</li>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Shadow Knight#Spell Vendors|Shadow Knight Spell Vendors]]</li>
+</ul>
+
+}}

@@ -1,0 +1,38 @@
+{{Classic Era}}
+{{Spellpage|
+
+| spellname = Impart Strength
+| spellicon = I
+| description = Imparts your target with a portion of your strength for 6 min.
+
+| classes = 
+
+* [[Necromancer]] - Level 8
+
+| slots = 
+
+{{SpellSlotRow | 1 | Increase STR by 10 }}
+
+| skill = [[Skill Alteration | Alteration]]
+
+| mana = 15
+| range = 100
+| casting_time = 4.00
+| fizzle_time = 2.25
+| recast_time = 5.00
+| duration = 6 minutes
+| target_type = Single Friendly (or Self)
+| spell_type = Beneficial
+| resist = Unresistable
+
+| msg_cast_on_you = You feel stronger.
+| msg_cast_on_other = Someone  looks stronger.
+| msg_wears_off = Your strength leaves you.
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
+}}

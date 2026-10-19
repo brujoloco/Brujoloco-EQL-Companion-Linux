@@ -1,0 +1,40 @@
+{{Spellpage|
+
+| spellname = Panic the Dead
+| spellicon = G
+| description = Inspires fear in an undead opponent, causing them to flee.
+
+| classes = 
+
+* [[Necromancer]] - Level 25
+* [[Cleric]] - Level 26
+* [[Shadowknight]] - Level 54
+
+| slots = 
+
+{{SpellSlotRow | 1 | Fear(4) }}
+
+| skill = [[Skill Alteration | Alteration]]
+
+| mana = 50
+| range = 200
+| casting_time = 2.00
+| fizzle_time = 2.25
+| recast_time = 4.00
+| duration = 9 ticks
+| target_type = Undead
+| spell_type = Detrimental
+| resist = Magic (0)
+
+| msg_cast_on_you = Your bones tingle.
+| msg_cast_on_other = Someone  has the fear of life put in them.
+| msg_wears_off =  
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+</ul>
+
+}}

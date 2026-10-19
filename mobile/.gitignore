@@ -1,0 +1,17 @@
+# Per-machine and generated. The project's own committed state is the source, app.json, eas.json
+# and the three generated data files (assets/*.png, src/phone/vectors.json,
+# src/phone/present/fixtures.json) — which ARE committed, so CI needs nothing from the desktop.
+node_modules/
+.expo/
+dist/
+web-build/
+# expo prebuild output. The managed workflow generates these on EAS from app.json; a committed
+# copy would silently outrank the config everybody actually edits.
+android/
+ios/
+# Signing material, if a local build ever produces any. NEVER commit one of these.
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision

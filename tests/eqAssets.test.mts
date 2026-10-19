@@ -1,0 +1,485 @@
+// THE GAME-ASSET READERS (EQ Zera, 2026-09-06; character-model spike): the PFS archive reader, the
+// WLD character / item readers and the animation reader, driven over the REAL archives when an
+// EverQuest Legends install is present, and skipped (saying so) when it is not - CI has no game.
+
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { existsSync, readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { readPfs } from '../src/main/eqassets/pfs'
+import { RACE_CODES, TRACK_FRAMES_AT, facesFor, readCharacter, readWld, trackFrameAt, type CharacterModel, type Skeleton, type WldFile } from '../src/main/eqassets/wld'
+import { readItem } from '../src/main/eqassets/wldItem'
+import { ddsToBmp, isDds } from '../src/main/eqassets/dds'
+import { boneShortName, readAnimation } from '../src/main/eqassets/wldAnim'
+import type { EqModelClip } from '../src/shared/eqModel'
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
+const EQ = 'C:/Users/Public/Daybreak Game Company/Installed Games/EverQuest Legends'
+const ARCHIVE = join(EQ, 'global_chr.s3d')
+const EQUIP = join(EQ, 'gequip.s3d')
+const present = existsSync(ARCHIVE) && existsSync(EQUIP)
+const SKIP = present ? false : 'no EverQuest Legends install on this machine - run where the game is'
+
+function races(): { pfs: ReturnType<typeof readPfs>; wld: ReturnType<typeof readWld> } {
+  const pfs = readPfs(readFileSync(ARCHIVE))
+  return { pfs, wld: readWld(pfs.read('global_chr.wld')!) }
+}
+
+/** The Iksar live in their own archive (JOS: "we want to represent everyone's characters"). */
+const GLOBAL4 = join(EQ, 'global4_chr.s3d')
+const SKIP4 = existsSync(GLOBAL4) ? false : 'no global4_chr.s3d on this machine - run where the game is'
+function iksar(): { pfs: ReturnType<typeof readPfs>; wld: ReturnType<typeof readWld> } {
+  const pfs = readPfs(readFileSync(GLOBAL4))
+  return { pfs, wld: readWld(pfs.read('global4_chr.wld')!) }
+}
+
+/** Every head texture a model's DRAWN groups bind, deduplicated and sorted. */
+function headTextures(model: CharacterModel): string[] {
+  const bound = model.meshes.flatMap((m) => m.groups.map((g) => m.materials[g.materialIndex]?.texture ?? ''))
+  return [...new Set(bound.filter((t) => /he\d{4}\.bmp$/.test(t)))].sort()
+}
+
+test('the archive lists its files and hands back the WLD and the bitmaps', { skip: SKIP }, () => {
+  const pfs = readPfs(readFileSync(ARCHIVE))
+  assert.ok(pfs.entries.length > 1000, 'global_chr.s3d carries every classic race texture')
+  assert.ok(pfs.has('global_chr.wld'))
+  const wldBytes = pfs.read('global_chr.wld')
+  assert.ok(wldBytes && wldBytes.length > 1_000_000)
+  const bmp = pfs.read('humch0001.bmp')
+  assert.ok(bmp && bmp.subarray(0, 2).toString() === 'BM', 'a texture inflates to a BMP')
+  assert.equal(pfs.read('nope.bmp'), undefined)
+})
+
+/** One mesh's claims: real geometry, finite posed vertices, in-range indices, textures on disk. */
+function checkMesh(mesh: { name: string; positions: number[]; normals: number[]; uvs: number[]; indices: number[]; skinIndices: number[]; groups: { materialIndex: number }[]; materials: { texture: string | null }[] }, has: (name: string) => boolean): void {
+  const n = mesh.positions.length / 3
+  assert.ok(n > 50 && mesh.indices.length >= 3 && mesh.indices.length % 3 === 0, `${mesh.name}: geometry`)
+  assert.equal(mesh.normals.length, mesh.positions.length)
+  assert.equal(mesh.uvs.length, n * 2)
+  assert.equal(mesh.skinIndices.length, n, `${mesh.name}: a bone per vertex`)
+  assert.ok(mesh.positions.every((v) => Number.isFinite(v)), `${mesh.name}: finite, posed vertices`)
+  assert.ok(mesh.indices.every((i) => i < n), `${mesh.name}: indices in range`)
+  for (const g of mesh.groups) {
+    const tex = mesh.materials[g.materialIndex]?.texture
+    if (tex) assert.ok(has(tex), `${mesh.name}: ${tex} is in the archive`)
+  }
+}
+
+test('every playable race, both genders, reads as a posed body plus a base head with its textures present', { skip: SKIP }, () => {
+  const { pfs, wld } = races()
+  assert.equal(wld.version, 0x15500, 'the old format this reader implements')
+  const codes = Object.keys(RACE_CODES).flatMap((race) => [`${race}M`, `${race}F`])
+  for (const code of codes) {
+    const model = readCharacter(wld, code)
+    assert.ok(model, `${code} resolves`)
+    assert.equal(model.meshes.length, 2, `${code}: body + base head`)
+    assert.ok(model.bones.length >= 20, `${code}: a skeleton`)
+    assert.ok(model.bones.every((b) => b.name.endsWith('_DAG')), `${code}: bones are named`)
+    assert.ok(model.bones.some((b) => b.name === `${code}R_POINT_DAG`), `${code}: the right-hand attachment point`)
+    for (const mesh of model.meshes) checkMesh(mesh, pfs.has)
+    // The game is Z-up: the figure's height is its z extent, about five units.
+    const zs = model.meshes.flatMap((m) => m.positions.filter((_, i) => i % 3 === 2))
+    assert.ok(Math.max(...zs) - Math.min(...zs) > 3, `${code}: the figure stands about five units tall`)
+  }
+})
+
+test('wear swaps a part to its armour texture when the archive has it, and picks the helm mesh', { skip: SKIP }, () => {
+  const { pfs, wld } = races()
+  const bare = readCharacter(wld, 'BAF')!
+  const plate = readCharacter(wld, 'BAF', { wear: { ch: 3, lg: 3, helm: 3 }, has: pfs.has })!
+  const chestOf = (m: typeof bare): string[] =>
+    m.meshes.flatMap((mesh) => mesh.groups.map((g) => mesh.materials[g.materialIndex]?.texture ?? '')).filter((t) => /^bafch/.test(t))
+  assert.ok(chestOf(bare).every((t) => /^bafch00/.test(t)), 'bare chest textures are the 00 variant')
+  assert.ok(chestOf(plate).length > 0 && chestOf(plate).every((t) => /^bafch03/.test(t)), 'plate chest textures are the 03 variant')
+  assert.ok(plate.meshes.some((m) => m.name === 'BAFHE03_DMSPRITEDEF'), 'the plate helm mesh replaces the bare head')
+  assert.ok(bare.meshes.some((m) => m.name === 'BAFHE00_DMSPRITEDEF'))
+  const noSuch = readCharacter(wld, 'BAF', { wear: { ch: 3 }, has: () => false })!
+  assert.ok(chestOf(noSuch).every((t) => /^bafch00/.test(t)), 'a variant the archive lacks leaves the texture alone')
+})
+
+test('the idle clip: humans carry their own, other races borrow it bone-for-bone and say so', { skip: SKIP }, () => {
+  const { wld } = races()
+  assert.equal(boneShortName('BAFBI_L_DAG', 'BAF'), 'BI_L')
+  assert.equal(boneShortName('BAF_DAG', 'BAF'), '', 'the root: its track is P01BAF_TRACKDEF')
+  const human = readCharacter(wld, 'HUM')!
+  const idle = readAnimation(wld, 'HUM', human.skeleton, 'P01')
+  assert.ok(idle, 'humans have P01')
+  assert.equal(idle.name, 'P01')
+  assert.ok(idle.frames > 1, `an idle has more than one frame (${String(idle.frames)})`)
+  assert.ok(idle.frameMs > 0 && idle.frameMs < 1000)
+  const animated = Object.keys(idle.tracks).length
+  assert.ok(animated >= human.bones.length / 2, `most bones move (${String(animated)} of ${String(human.bones.length)})`)
+  for (const track of Object.values(idle.tracks)) {
+    assert.equal(track.q.length / 4, track.t.length / 3)
+    assert.ok(track.q.every((v) => Number.isFinite(v)))
+  }
+  const barbarian = readCharacter(wld, 'BAF')!
+  const borrowed = readAnimation(wld, 'BAF', barbarian.skeleton, 'P01')
+  assert.ok(borrowed, 'barbarians borrow the human idle')
+  assert.equal(borrowed.name, 'P01*', 'and the clip says it is borrowed')
+  assert.equal(readAnimation(wld, 'BAF', barbarian.skeleton, 'Z99'), null, 'an animation nobody has is null')
+})
+
+test('weapon models read as rigid meshes out of gequip.s3d', { skip: SKIP }, () => {
+  const pfs = readPfs(readFileSync(EQUIP))
+  const wld = readWld(pfs.read('gequip.wld')!)
+  for (const code of ['IT1', 'IT5', 'IT7', 'IT22', 'IT24', 'IT68']) {
+    const mesh = readItem(wld, code)
+    assert.ok(mesh, `${code} resolves`)
+    assert.ok(mesh.positions.length >= 9 && mesh.indices.length >= 3, `${code}: geometry`)
+    assert.equal(mesh.skinIndices.length, 0, `${code}: rigid`)
+    for (const g of mesh.groups) {
+      const tex = mesh.materials[g.materialIndex]?.texture
+      if (tex) assert.ok(pfs.has(tex), `${code}: ${tex} is in the archive`)
+    }
+  }
+  assert.equal(readItem(wld, 'IT999999'), null)
+  // A weapon is held by its grip: the mesh's centre puts the grip at the origin and the blade out along +x.
+  const sword = readItem(wld, 'IT1')!
+  let minX = Infinity
+  let maxX = -Infinity
+  for (let i = 0; i < sword.positions.length; i += 3) {
+    minX = Math.min(minX, sword.positions[i])
+    maxX = Math.max(maxX, sword.positions[i])
+  }
+  assert.ok(minX > -0.7 && minX < 0, `the grip sits just behind the hand (min x ${minX.toFixed(2)})`)
+  assert.ok(maxX > 2, `the blade reaches out in front (max x ${maxX.toFixed(2)})`)
+})
+
+test('the fist weapon IT68 is a four-frame additive glow, every frame in the archive', { skip: SKIP }, () => {
+  const pfs = readPfs(readFileSync(EQUIP))
+  const wld = readWld(pfs.read('gequip.wld')!)
+  const fist = readItem(wld, 'IT68')
+  assert.ok(fist?.materials.some((m) => /^fist/i.test(m.texture ?? '')), 'IT68 is the fist weapon, by its texture')
+  const glow = fist?.materials.find((m) => m.frames !== undefined)
+  assert.deepEqual(glow?.frames, ['fisttrans1.bmp', 'fisttrans2.bmp', 'fisttrans3.bmp', 'fisttrans4.bmp'], 'the glow is a four-frame pulse')
+  assert.equal(glow?.frameMs, 100)
+  assert.equal(glow?.type, 0x0b, 'drawn additively, so its black is invisible')
+  for (const f of glow?.frames ?? []) assert.ok(pfs.has(f), `${f} is in the archive`)
+})
+
+test('the item table maps the game item id to its model: a monk fist weapon is IT68, not a mace', () => {
+  const table = JSON.parse(readFileSync(join(ROOT, 'src', 'main', 'data', 'itemModels.json'), 'utf8')) as { byId: Record<string, { model: string; material: number }> }
+  assert.equal(table.byId['27715']?.model, 'IT68', "Wu's Fist of Mastery")
+  assert.ok(Object.keys(table.byId).length > 5000, 'the catalog is covered')
+})
+
+test('an item rigged on its own skeleton (the orb IT10512 in gequip5) reads as one posed rigid mesh', { skip: SKIP || !existsSync(join(EQ, 'gequip5.s3d')) }, () => {
+  const pfs = readPfs(readFileSync(join(EQ, 'gequip5.s3d')))
+  const wld = readWld(pfs.read('gequip5.wld')!)
+  const orb = readItem(wld, 'IT10512')
+  assert.ok(orb, 'IT10512 resolves through its skeleton')
+  assert.ok(orb.positions.length >= 9 && orb.indices.length >= 3, 'geometry')
+  assert.equal(orb.skinIndices.length, 0, 'flattened rigid')
+  assert.equal(orb.rigged, true, 'and marked as the kind the client turns in the hand')
+  assert.equal(readItem(readWld(readPfs(readFileSync(EQUIP)).read('gequip.wld')!), 'IT68')?.rigged, undefined, 'a plain mesh is not')
+  assert.ok(orb.groups.every((g) => g.materialIndex < orb.materials.length), 'every group names a merged material')
+  assert.ok(orb.indices.every((i) => i * 3 < orb.positions.length), 'every index is re-based into the merged vertices')
+  // Its texture is a DDS, which the renderer cannot show: it decodes to a BMP of the same size with real pixels.
+  const tex = orb.materials[0]?.texture
+  assert.ok(tex?.endsWith('.dds'), 'the later archives carry DDS textures')
+  const dds = Buffer.from(pfs.read(tex)!)
+  assert.ok(isDds(dds))
+  const bmp = ddsToBmp(dds)
+  assert.ok(bmp, 'decodes')
+  assert.equal(bmp.toString('latin1', 0, 2), 'BM')
+  assert.equal(bmp.readInt32LE(18), dds.readUInt32LE(16), 'width')
+  assert.equal(bmp.readInt32LE(22), dds.readUInt32LE(12), 'height')
+  assert.equal(bmp.length, 54 + bmp.readInt32LE(18) * bmp.readInt32LE(22) * 4)
+  let lit = 0
+  for (let i = 54; i < bmp.length; i += 4) if (bmp[i] + bmp[i + 1] + bmp[i + 2] > 60) lit++
+  assert.ok(lit > 0, 'the glow has lit pixels')
+})
+
+test('the DDS decoder: a hand-made DXT1 block decodes to its two colours, and non-DDS bytes are null', () => {
+  // One 4x4 DXT1 block: c0 = pure red (0xF800), c1 = pure blue (0x001F), every pixel index 0 (red) except
+  // the last row, index 1 (blue).
+  const b = Buffer.alloc(128 + 8)
+  b.writeUInt32LE(0x20534444, 0)
+  b.writeUInt32LE(124, 4)
+  b.writeUInt32LE(4, 12)
+  b.writeUInt32LE(4, 16)
+  b.write('DXT1', 84, 'latin1')
+  b.writeUInt16LE(0xf800, 128)
+  b.writeUInt16LE(0x001f, 130)
+  b.writeUInt32LE(0x55000000, 132)
+  const bmp = ddsToBmp(b)
+  assert.ok(bmp)
+  assert.equal(bmp.readInt32LE(18), 4)
+  // BMP rows are stored bottom-up, so the DDS's first row lands last in the file: the flip is deliberate.
+  const px = (i: number): number[] => [bmp[54 + i * 4 + 2], bmp[54 + i * 4 + 1], bmp[54 + i * 4]]
+  assert.deepEqual(px(0), [255, 0, 0], 'DDS row 0 is red')
+  assert.deepEqual(px(12), [0, 0, 255], 'DDS row 3 is blue')
+  assert.equal(ddsToBmp(Buffer.from('BM not a dds')), null)
+  assert.equal(isDds(Buffer.from('BM')), false)
+})
+
+test('an actor the WLD does not have is null, not a throw', { skip: SKIP }, () => {
+  const { wld } = races()
+  assert.equal(readCharacter(wld, 'ZZZ'), null)
+})
+
+test('bytes that are not a PFS or a WLD are refused with a plain error', () => {
+  assert.throws(() => readPfs(new Uint8Array(64)), /not a PFS/)
+  assert.throws(() => readWld(new Uint8Array(64)), /not a WLD/)
+})
+
+// ---- faces (EQ Zera, 2026-09-08; "we want to represent everyone's characters") ----------------
+//
+// A FACE IS A HEAD TEXTURE, `<race>he00<F><P>.bmp`: F the face, P the piece. The pick substitutes
+// F and KEEPS P, over every drawn mesh (head textures sit on some BODY meshes too), and only where
+// the archive really has the file.
+
+test('a face pick swaps the F digit, keeps the piece, and only where the archive has the file', { skip: SKIP }, () => {
+  const { pfs, wld } = races()
+  const bare = readCharacter(wld, 'HUM')!
+  assert.deepEqual(headTextures(bare), ['humhe0001.bmp', 'humhe0002.bmp'], 'the human male head is shipped wearing face 0')
+  const faced = readCharacter(wld, 'HUM', { wear: { face: 3 }, has: pfs.has })!
+  assert.deepEqual(headTextures(faced), ['humhe0031.bmp', 'humhe0032.bmp'], 'face 3 keeps both pieces and moves only the F digit')
+  for (const t of headTextures(faced)) assert.ok(pfs.has(t), `${t} is really in the archive`)
+  assert.deepEqual(facesFor('HUM', pfs.has), [0, 1, 2, 3, 4, 5, 6, 7], 'the human male has all eight faces')
+  assert.equal(bare.defaultFace, 0, 'and his bare head binds face 0')
+})
+
+test('the two races with no face 0 report [1..7] and bind face 2, and a pick they lack changes nothing', { skip: SKIP }, () => {
+  const { pfs, wld } = races()
+  for (const code of ['HUF', 'DWF']) {
+    const bare = readCharacter(wld, code)!
+    assert.deepEqual(facesFor(code, pfs.has), [1, 2, 3, 4, 5, 6, 7], `${code}: seven faces, numbered from one`)
+    assert.equal(bare.defaultFace, 2, `${code}: the bare head binds face 2`)
+    assert.ok(!pfs.has(`${code.toLowerCase()}he0001.bmp`), `${code}: there is no face 0 file at all`)
+    const zero = readCharacter(wld, code, { wear: { face: 0 }, has: pfs.has })!
+    assert.deepEqual(headTextures(zero), headTextures(bare), `${code}: a face the archive lacks leaves every texture alone`)
+    const five = readCharacter(wld, code, { wear: { face: 5 }, has: pfs.has })!
+    assert.ok(headTextures(five).every((t) => /he005\d\.bmp$/.test(t)), `${code}: face 5 reaches the body's neck strip too`)
+  }
+})
+
+test('the Iksar read out of global4_chr.s3d, faces and all, and their detail pieces survive the swap', { skip: SKIP4 }, () => {
+  const { pfs, wld } = iksar()
+  for (const code of ['IKM', 'IKF']) {
+    const model = readCharacter(wld, code)!
+    assert.ok(model.meshes.length >= 1, `${code}: at least one mesh`)
+    assert.ok(model.bones.length >= 20, `${code}: a skeleton (${String(model.bones.length)} bones)`)
+    assert.deepEqual(facesFor(code, pfs.has), [0, 1, 2, 3, 4, 5, 6, 7], `${code}: eight faces`)
+    assert.equal(model.defaultFace, 0, `${code}: the bare head binds face 0`)
+  }
+  // THE GUARD, MEASURED. The Iksar female's head binds SEVEN pieces of face 0 and only pieces 1
+  // and 2 exist at the other faces, so an unguarded substitution would blank five of them. (The
+  // classic archive binds two pieces per head and cannot show this at all.)
+  const bare = readCharacter(wld, 'IKF')!
+  assert.equal(headTextures(bare).length, 7, 'the Iksar female binds seven face-0 pieces')
+  const faced = readCharacter(wld, 'IKF', { wear: { face: 3 }, has: pfs.has })!
+  assert.deepEqual(headTextures(faced), ['ikfhe0003.bmp', 'ikfhe0004.bmp', 'ikfhe0005.bmp', 'ikfhe0006.bmp', 'ikfhe0007.bmp', 'ikfhe0031.bmp', 'ikfhe0032.bmp'], 'pieces 1 and 2 move to face 3; the five that exist at face 0 alone stay')
+  // The idle: the Iksar male carries his own P01. The female carries none, and no human lives in
+  // this archive at all - the donor ranking reaching across the sexes is what stops her standing in
+  // her bind pose, and it is pinned in its own test below.
+  const male = readAnimation(wld, 'IKM', readCharacter(wld, 'IKM')!.skeleton, 'P01')
+  assert.ok(male && male.frames > 1, 'IKM has an idle of its own')
+  assert.equal(male.name, 'P01', 'and it is not borrowed')
+  assert.equal(readAnimation(wld, 'IKF', bare.skeleton, 'Z99'), null, 'an animation nobody in this archive has is still null')
+})
+
+// ---- the idle, and the rigs it is borrowed onto (EQ Zera, 1.19.1) -----------------------------
+//
+// 1.19.0 shipped the borrow copying the source clip's per-bone TRANSLATIONS - that rig's own limb
+// lengths - onto whatever skeleton asked for it, and the owner got back "stretched and contorted
+// bodies" on every rig unlike a human male, plus an Iksar female "stuck in spread eagle" because
+// her archive holds no human to borrow from at all. Both halves are pinned here.
+
+const ALL_CODES = Object.keys(RACE_CODES).flatMap((r) => [`${r}M`, `${r}F`])
+
+test('every classic actor gets an idle, and a BORROWED one keeps the target rig’s own proportions', { skip: SKIP }, () => {
+  const { wld } = races()
+  for (const code of ALL_CODES) {
+    const model = readCharacter(wld, code)!
+    const clip = readAnimation(wld, code, model.skeleton, 'P01')
+    assert.ok(clip, `${code}: has an idle`)
+    assert.ok(Object.keys(clip.tracks).length > 10, `${code}: most bones are animated`)
+    for (const [index, track] of Object.entries(clip.tracks)) {
+      const bone = model.skeleton.bones[Number(index)]
+      // MATCHED BY NAME, NEVER BY INDEX: the track this bone got must be the one named after it.
+      const short = boneShortName(bone.name, code)
+      const source = clip.name === 'P01' ? code : null
+      if (source) assert.ok(wld.byName.has(`P01${source}${short}_TRACKDEF`), `${code}: ${bone.name} took its own track`)
+      assert.equal(track.q.length / 4, track.t.length / 3, `${code}: ${bone.name} frame counts agree`)
+      if (clip.name === 'P01') continue
+      // A BORROWED track carries the TARGET bone’s own bind offset, every frame - never the
+      // source rig’s. This is the whole of the 1.19.0 fix: a pose is rotations.
+      for (let f = 0; f < track.t.length / 3; f++) {
+        assert.deepEqual(track.t.slice(f * 3, f * 3 + 3), bone.local.t, `${code}: ${bone.name} keeps its own bind offset in a borrowed clip`)
+      }
+    }
+  }
+})
+
+test('the ranked donor reaches across the sexes when a rig has no same-sex lender - the Iksar female moves', { skip: SKIP4 }, () => {
+  const { wld } = iksar()
+  const male = readCharacter(wld, 'IKM')!
+  const female = readCharacter(wld, 'IKF')!
+  assert.equal(readAnimation(wld, 'IKM', male.skeleton, 'P01')?.name, 'P01', 'IKM has its own idle')
+  const borrowed = readAnimation(wld, 'IKF', female.skeleton, 'P01')
+  assert.ok(borrowed, 'IKF borrows rather than standing in her bind pose - global4 carries no human at all')
+  // Her archive holds no female actor with an idle, so the ranking falls to its next rung, the
+  // same RACE - and IKM outranks the undead IKS because IKS names no sex and is not a player.
+  assert.equal(borrowed.name, 'P01*', 'and the clip says it is borrowed')
+  assert.ok(Object.keys(borrowed.tracks).length > 30, `most of her bones move (${String(Object.keys(borrowed.tracks).length)} of ${String(female.bones.length)})`)
+  for (const [index, track] of Object.entries(borrowed.tracks)) {
+    const bone = female.skeleton.bones[Number(index)]
+    assert.ok(bone, `track ${index} names a real IKF bone`)
+    assert.ok(wld.byName.has(`P01IKM${boneShortName(bone.name, 'IKF')}_TRACKDEF`), `${bone.name} took IKM's track of the same name`)
+    assert.deepEqual(track.t.slice(0, 3), bone.local.t, `${bone.name}: her own bind offset, not his`)
+  }
+})
+
+/** Every bitmap a model's DRAWN groups name, mesh by mesh. */
+function drawnTextures(model: CharacterModel): string[] {
+  return model.meshes.flatMap((m) => m.groups.map((g) => m.materials[g.materialIndex]?.texture ?? ''))
+}
+
+test('no drawn material anywhere references a bitmap the archive does not have', { skip: SKIP }, () => {
+  const { pfs, wld } = races()
+  const WEARS = [{}, { ch: 3, ua: 3, fa: 3, hn: 3, lg: 3, ft: 3, helm: 1 } as const]
+  const cases = ALL_CODES.flatMap((code) => WEARS.map((wear) => ({ code, wear })))
+  for (const { code, wear } of cases) {
+    const model = readCharacter(wld, code, { wear, has: pfs.has })!
+    for (const tex of drawnTextures(model)) {
+      if (tex) assert.ok(pfs.has(tex), `${code}: a drawn material names ${tex}, which is not in the archive`)
+    }
+  }
+})
+
+test('an EMPTY wear changes not one texture - the guard against a dressing regression', { skip: SKIP }, () => {
+  const { pfs, wld } = races()
+  for (const code of ALL_CODES) {
+    const shipped = readCharacter(wld, code)!
+    const dressedInNothing = readCharacter(wld, code, { wear: {}, has: pfs.has })!
+    assert.deepEqual(headTextures(dressedInNothing), headTextures(shipped), `${code}: head`)
+    assert.deepEqual(drawnTextures(dressedInNothing), drawnTextures(shipped), `${code}: every drawn material, in order`)
+  }
+})
+
+// ---- the borrow's POSE, not just its proportions (EQ Zera, 1.19.2) ---------------------------
+//
+// 1.19.1 stopped a borrowed clip carrying the donor's limb LENGTHS. The owner's next report was
+// that eight female rigs plus the ogre, troll, halfling and gnome males still did "weird things
+// with their arms", and the cause was the donor: a track states a bone's orientation RELATIVE TO
+// ITS PARENT, so it only means the same thing on a rig that RESTS the same way, and every female
+// rig rests differently from HUM. MEASURED, as the upper arm's angle off straight down at
+// mid-idle: borrowing HUM, a female came out at 96 degrees - arms straight out sideways; the
+// halfling and gnome males came out lopsided (44 left, 17 right). These are the two shapes of
+// that failure, asserted directly on every actor.
+
+/** q * r, and v rotated by q - just enough quaternion to walk a skeleton into world space. */
+function qmul(a: readonly number[], b: readonly number[]): number[] {
+  return [
+    a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1],
+    a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+    a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3],
+    a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]
+  ]
+}
+function qrot(q: readonly number[], v: readonly number[]): number[] {
+  const [x, y, z, w] = q
+  const ix = w * v[0] + y * v[2] - z * v[1]
+  const iy = w * v[1] + z * v[0] - x * v[2]
+  const iz = w * v[2] + x * v[1] - y * v[0]
+  const iw = -x * v[0] - y * v[1] - z * v[2]
+  return [ix * w + iw * -x + iy * -z - iz * -y, iy * w + iw * -y + iz * -x - ix * -z, iz * w + iw * -z + ix * -y - iy * -x]
+}
+
+/** Every bone's world orientation for one frame of a clip; a bone with no track holds its bind pose. */
+function poseAt(skeleton: Skeleton, clip: EqModelClip, frame: number): number[][] {
+  const out: number[][] = skeleton.bones.map(() => [0, 0, 0, 1])
+  const visit = (i: number, parent: readonly number[]): void => {
+    const track = clip.tracks[i]
+    const f = track ? Math.min(frame, track.q.length / 4 - 1) : 0
+    const local = track ? track.q.slice(f * 4, f * 4 + 4) : skeleton.bones[i].local.q
+    out[i] = qmul(parent, local)
+    for (const c of skeleton.bones[i].children) visit(c, out[i])
+  }
+  if (skeleton.bones.length > 0) visit(0, [0, 0, 0, 1])
+  return out
+}
+
+/** A posed rig, ready to be asked where a limb points. */
+interface Posed {
+  skeleton: Skeleton
+  code: string
+  pose: number[][]
+}
+
+/** The angle, in degrees, between a bone's direction toward `child` and straight DOWN (the game is Z up). */
+function limbAngle({ skeleton, code, pose }: Posed, bone: string, child: string): number | null {
+  const short = skeleton.bones.map((b) => boneShortName(b.name, code))
+  const i = short.indexOf(bone)
+  if (i < 0) return null
+  const c = skeleton.bones[i].children.find((k) => short[k] === child)
+  if (c === undefined) return null
+  const v = qrot(pose[i], skeleton.bones[c].local.t)
+  const n = Math.hypot(v[0], v[1], v[2])
+  return n < 1e-9 ? null : (Math.acos(Math.max(-1, Math.min(1, -v[2] / n))) * 180) / Math.PI
+}
+
+/** An idle has the arms down at the sides, and both of them in the same place. */
+const ARM_MAX_FROM_DOWN = 60
+const ARM_MAX_SPREAD = 15
+
+test('every actor’s idle stands with its arms down at its sides, and not one arm out', { skip: SKIP }, () => {
+  const { wld } = races()
+  for (const code of ALL_CODES) {
+    const model = readCharacter(wld, code)!
+    const clip = readAnimation(wld, code, model.skeleton, 'P01')!
+    const posed: Posed = { skeleton: model.skeleton, code, pose: poseAt(model.skeleton, clip, Math.floor(clip.frames / 2)) }
+    const left = limbAngle(posed, 'BI_L', 'FO_L')
+    const right = limbAngle(posed, 'BI_R', 'FO_R')
+    assert.ok(left !== null && right !== null, `${code}: has both upper arms`)
+    const detail = `${left.toFixed(0)} / ${right.toFixed(0)} degrees off straight down`
+    assert.ok(left < ARM_MAX_FROM_DOWN, `${code}: left arm hangs at the side, not out sideways (${detail})`)
+    assert.ok(right < ARM_MAX_FROM_DOWN, `${code}: right arm hangs at the side (${detail})`)
+    assert.ok(Math.abs(left - right) <= ARM_MAX_SPREAD, `${code}: the two arms agree with each other (${detail})`)
+    const thigh = limbAngle(posed, 'TH_L', 'CA_L')
+    assert.ok(thigh !== null && thigh < ARM_MAX_FROM_DOWN, `${code}: it stands on its legs (${String(thigh)})`)
+  }
+})
+
+/** The actor a clip was borrowed from: the one whose own frame-0 tracks it reproduces exactly. */
+function donorOf(wld: WldFile, code: string, skeleton: Skeleton, clip: EqModelClip): string | null {
+  const short = skeleton.bones.map((b) => boneShortName(b.name, code))
+  const actors = new Set<string>()
+  for (const name of wld.byName.keys()) {
+    const m = /^P01([A-Z]{3})(PE)?_TRACKDEF$/.exec(name)
+    if (m && m[1] !== code) actors.add(m[1])
+  }
+  const entries = Object.entries(clip.tracks)
+  for (const actor of actors) {
+    const same = entries.every(([i, track]) => {
+      const def = wld.byName.get(`P01${actor}${short[Number(i)]}_TRACKDEF`)
+      if (def?.type !== 0x12) return false
+      const q = trackFrameAt(def.body, TRACK_FRAMES_AT).q
+      return q.every((v, k) => Math.abs(v - track.q[k]) < 1e-6)
+    })
+    if (same && entries.length > 0) return actor
+  }
+  return null
+}
+
+test('a borrowed idle comes from a PLAYER actor of the same sex where the archive has one', { skip: SKIP }, () => {
+  const { wld } = races()
+  const borrowed = ALL_CODES.filter((code) => {
+    const model = readCharacter(wld, code)!
+    return readAnimation(wld, code, model.skeleton, 'P01')!.name === 'P01*'
+  })
+  assert.ok(borrowed.length > 0, 'some actors do borrow - otherwise this test proves nothing')
+  for (const code of borrowed) {
+    const model = readCharacter(wld, code)!
+    const clip = readAnimation(wld, code, model.skeleton, 'P01')!
+    const donor = donorOf(wld, code, model.skeleton, clip)
+    assert.ok(donor, `${code}: the clip is reproducible from one actor's own tracks`)
+    // A DONOR WITH A SEX IS A PLAYER RACE'S ACTOR. The archives carry undead and monster actors with
+    // their own P01 and bone tables that score well; a player character borrows a player character.
+    assert.match(donor, /[MF]$/, `${code} borrowed ${donor}, which is not a player actor`)
+    assert.equal(donor.slice(-1), code.slice(-1), `${code} borrowed ${donor}, which is the other sex - the whole 1.19.1 bug`)
+  }
+})

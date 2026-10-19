@@ -1,0 +1,519 @@
+<title>EQ Zera</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+html,body{background:#0c0a1f;margin:0}
+/* ==========================================================================
+   EQ Zera — eqzera.com
+   Paste this whole file into WordPress: Appearance → Customize → Additional CSS
+   (or Styles → Additional CSS in the site editor). Every rule is prefixed
+   .eqz- so nothing here touches the theme's own styling.
+   ========================================================================== */
+
+.eqz-page{
+  --eqz-ground:#0c0a1f;
+  --eqz-ground-2:#13102c;
+  --eqz-panel:#1a1638;
+  --eqz-line:#2d2757;
+  --eqz-ink:#efeaff;
+  --eqz-ink-2:#b8b0d9;
+  --eqz-ink-3:#7d75a6;
+  --eqz-cyan:#5ee6ff;
+  --eqz-pink:#ff5fb8;
+  --eqz-violet:#a98fe0;
+  --eqz-sun:#c7a2ff;
+  --eqz-green:#7ee0a0;
+  --eqz-gold:#f0c46a;
+  --eqz-display:'Chakra Petch','Bahnschrift','Segoe UI',sans-serif;
+  --eqz-body:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+  --eqz-mono:'JetBrains Mono','Cascadia Code',Consolas,monospace;
+  background:var(--eqz-ground);
+  color:var(--eqz-ink);
+  font-family:var(--eqz-body);
+  font-size:18px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+/* full-bleed: escape the theme's content column */
+.eqz-page{width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);overflow-x:hidden}
+.eqz-wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.eqz-page *{box-sizing:border-box}
+.eqz-page a{color:var(--eqz-cyan);text-decoration:none}
+.eqz-page a:hover{text-decoration:underline}
+.eqz-page a:focus-visible,.eqz-page button:focus-visible{outline:2px solid var(--eqz-cyan);outline-offset:3px}
+.eqz-page h1,.eqz-page h2,.eqz-page h3{font-family:var(--eqz-display);color:var(--eqz-ink);margin:0;text-wrap:balance;line-height:1.1}
+.eqz-page p{margin:0}
+.eqz-page code{font-family:var(--eqz-mono);font-size:.9em;background:var(--eqz-panel);border:1px solid var(--eqz-line);padding:.1em .4em;border-radius:4px;color:var(--eqz-sun)}
+.eqz-eyebrow{font-family:var(--eqz-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--eqz-pink);margin-bottom:14px}
+
+/* ---------------- top bar ---------------- */
+.eqz-top{border-bottom:1px solid var(--eqz-line);background:rgba(12,10,31,.85);backdrop-filter:blur(8px)}
+.eqz-top .eqz-wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.eqz-brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;white-space:nowrap;font-family:var(--eqz-display);font-weight:700;font-size:18px;letter-spacing:.04em;color:var(--eqz-ink)!important}
+.eqz-brand img{width:28px;height:28px}
+.eqz-nav{display:flex;gap:26px;font-size:15px;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.eqz-nav::-webkit-scrollbar{display:none}
+.eqz-nav a{color:var(--eqz-ink-2);flex:0 0 auto;white-space:nowrap}
+/* WordPress.com's sanitizer drops the wrapper element the links sit in when it is a <nav> (it is a
+   <div class="eqz-nav"> in the source now), so a page pushed before that change has the links loose
+   in the bar; this keeps them styled and unbroken until that page is next pushed. */
+.eqz-top .eqz-wrap>a:not(.eqz-brand){color:var(--eqz-ink-2);flex:0 0 auto;white-space:nowrap;font-size:15px}
+/* Narrow screens: the brand keeps the first row, the nav takes a row of its own and scrolls sideways
+   rather than wrapping its labels mid-phrase. No breakpoint hides the nav: a phone that reports a
+   wide CSS viewport (Samsung screen zoom, "desktop site") still gets a header that fits. */
+@media (max-width:640px){.eqz-top .eqz-wrap{height:auto;flex-wrap:wrap;padding-top:10px;padding-bottom:8px;gap:6px 16px}.eqz-nav{width:100%;gap:18px;font-size:14px;padding-bottom:4px}}
+
+/* ---------------- hero ---------------- */
+.eqz-hero{position:relative;padding:72px 0 64px;overflow:hidden;
+  background:
+    radial-gradient(60% 45% at 78% 22%,rgba(199,162,255,.22),transparent 70%),
+    radial-gradient(40% 30% at 20% 90%,rgba(94,230,255,.10),transparent 70%),
+    var(--eqz-ground)}
+.eqz-hero::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-2px;height:38%;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,95,184,.22) 0 1px,transparent 1px 84px),
+    repeating-linear-gradient(0deg,rgba(255,95,184,.22) 0 1px,transparent 1px 34px);
+  transform:perspective(420px) rotateX(62deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.7),transparent);mask-image:linear-gradient(to top,rgba(0,0,0,.7),transparent)}
+.eqz-hero .eqz-wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:center}
+@media (max-width:860px){.eqz-hero .eqz-wrap{grid-template-columns:1fr}}
+.eqz-hero h1{font-size:clamp(44px,7vw,76px);font-weight:700;letter-spacing:.02em;
+  background:linear-gradient(180deg,#fff 0%,var(--eqz-sun) 60%,var(--eqz-pink) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.eqz-hero .eqz-sub{font-family:var(--eqz-body);font-weight:400;font-size:clamp(19px,2.2vw,23px);line-height:1.4;color:var(--eqz-ink-2);max-width:34ch;margin:18px 0 10px}
+.eqz-hero .eqz-sub2{color:var(--eqz-ink-3);font-size:17px;margin:0 0 30px}
+.eqz-hero .eqz-sub strong{color:var(--eqz-ink);font-weight:600}
+.eqz-cta{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.eqz-btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--eqz-display);font-weight:700;font-size:17px;letter-spacing:.03em;
+  padding:15px 26px;border-radius:6px;border:1px solid transparent;transition:transform .15s,box-shadow .15s;text-decoration:none!important}
+.eqz-btn-primary{background:linear-gradient(135deg,var(--eqz-cyan),#8ab4ff 55%,var(--eqz-pink));color:#0c0a1f!important;box-shadow:0 8px 30px rgba(94,230,255,.25)}
+.eqz-btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 36px rgba(255,95,184,.3)}
+.eqz-btn-ghost{color:var(--eqz-ink)!important;border-color:var(--eqz-line);background:rgba(26,22,56,.6)}
+.eqz-btn-ghost:hover{border-color:var(--eqz-violet)}
+.eqz-btn svg{width:18px;height:18px;fill:currentColor}
+.eqz-meta{margin-top:16px;font-family:var(--eqz-mono);font-size:13px;color:var(--eqz-ink-3);display:flex;flex-wrap:wrap;gap:6px 18px}
+.eqz-meta b{color:var(--eqz-ink-2);font-weight:600}
+
+/* the DPS meter mock */
+.eqz-mock{background:var(--eqz-panel);border:1px solid var(--eqz-line);border-radius:10px;padding:16px 18px 18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 1px rgba(199,162,255,.06) inset;font-family:var(--eqz-mono);font-size:13px}
+.eqz-mock-hd{display:flex;justify-content:space-between;align-items:baseline;color:var(--eqz-ink-2);margin-bottom:12px;gap:12px}
+.eqz-mock-hd b{color:var(--eqz-ink);font-weight:600}
+.eqz-mock-hd .r{color:var(--eqz-cyan);font-variant-numeric:tabular-nums}
+.eqz-row{position:relative;display:grid;grid-template-columns:1fr auto;gap:0 12px;padding:8px 10px;margin:4px 0;border-radius:4px;overflow:hidden;background:rgba(12,10,31,.45)}
+.eqz-row i{position:absolute;left:0;top:0;bottom:0;opacity:.28;border-radius:4px}
+.eqz-row .nm,.eqz-row .val,.eqz-row .sub{position:relative}
+.eqz-row .nm{color:var(--eqz-ink);font-weight:600}
+.eqz-row .val{color:var(--eqz-ink);font-variant-numeric:tabular-nums;text-align:right}
+.eqz-row .sub{grid-column:1/-1;color:var(--eqz-ink-3);font-size:11.5px;margin-top:2px}
+.eqz-row .miss{color:var(--eqz-pink)}
+.eqz-mock-ft{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--eqz-line);color:var(--eqz-ink-3);font-size:11.5px}
+.eqz-mock-ft .up{color:var(--eqz-green)}
+
+/* ---------------- trust strip ---------------- */
+.eqz-trust{border-top:1px solid var(--eqz-line);border-bottom:1px solid var(--eqz-line);background:var(--eqz-ground-2)}
+.eqz-trust .eqz-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:26px 24px}
+@media (max-width:720px){.eqz-trust .eqz-wrap{grid-template-columns:1fr}}
+.eqz-trust h3{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--eqz-cyan);margin-bottom:6px}
+.eqz-trust p{color:var(--eqz-ink-2);font-size:16px}
+
+/* ---------------- sections ---------------- */
+.eqz-section{padding:80px 0}
+.eqz-section + .eqz-section{border-top:1px solid var(--eqz-line)}
+.eqz-section h2{font-size:clamp(28px,4vw,40px);font-weight:700;margin-bottom:12px}
+.eqz-lede{color:var(--eqz-ink-2);max-width:62ch;font-size:19px;margin-bottom:40px}
+
+.eqz-features{display:grid;grid-template-columns:repeat(2,1fr);gap:22px 40px}
+@media (max-width:720px){.eqz-features{grid-template-columns:1fr}}
+.eqz-feature{padding:22px 0 22px 22px;border-left:2px solid var(--eqz-line);position:relative}
+.eqz-feature::before{content:"";position:absolute;left:-2px;top:22px;width:2px;height:28px;background:var(--eqz-pink)}
+.eqz-feature h3{font-size:19px;margin-bottom:8px}
+.eqz-feature p{color:var(--eqz-ink-2);font-size:17px;max-width:48ch}
+
+.eqz-steps{counter-reset:step;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+@media (max-width:900px){.eqz-steps{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.eqz-steps{grid-template-columns:1fr}}
+.eqz-step{background:var(--eqz-panel);border:1px solid var(--eqz-line);border-radius:8px;padding:22px 20px 24px}
+.eqz-step::before{counter-increment:step;content:counter(step);display:block;font-family:var(--eqz-display);font-size:34px;font-weight:700;color:var(--eqz-cyan);line-height:1;margin-bottom:12px}
+.eqz-step h3{font-size:18px;margin-bottom:8px}
+.eqz-step p{color:var(--eqz-ink-2);font-size:16px}
+.eqz-note{margin-top:28px;padding:18px 22px;border-radius:8px;border:1px solid rgba(240,196,106,.35);background:rgba(240,196,106,.06);color:var(--eqz-ink-2);font-size:16px;max-width:80ch}
+.eqz-note b{color:var(--eqz-gold)}
+
+.eqz-two{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+@media (max-width:820px){.eqz-two{grid-template-columns:1fr}}
+.eqz-two h3{font-size:20px;margin-bottom:10px}
+.eqz-two p{color:var(--eqz-ink-2);font-size:17px;max-width:56ch}
+.eqz-two p + p{margin-top:12px}
+
+.eqz-releases{display:grid;gap:0;max-width:820px}
+.eqz-release{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:18px 0;border-top:1px solid var(--eqz-line)}
+.eqz-release:last-child{border-bottom:1px solid var(--eqz-line)}
+@media (max-width:560px){.eqz-release{grid-template-columns:1fr;gap:6px}}
+.eqz-release .v{font-family:var(--eqz-mono);color:var(--eqz-cyan);font-weight:600}
+.eqz-release .v small{display:block;color:var(--eqz-ink-3);font-weight:400;margin-top:4px}
+.eqz-release ul{margin:0;padding-left:18px;color:var(--eqz-ink-2);font-size:16px;list-style:disc}
+.eqz-release li{margin:4px 0}
+.eqz-tag{display:inline-block;font-family:var(--eqz-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.eqz-tag-new{background:rgba(126,224,160,.15);color:var(--eqz-green)}
+.eqz-tag-fixed{background:rgba(94,230,255,.15);color:var(--eqz-cyan)}
+.eqz-tag-changed{background:rgba(199,162,255,.15);color:var(--eqz-sun)}
+.eqz-more{margin-top:22px;font-size:16px}
+
+/* ---------------- faq ---------------- */
+.eqz-faq{display:grid;grid-template-columns:repeat(2,1fr);gap:30px 44px}
+@media (max-width:720px){.eqz-faq{grid-template-columns:1fr}}
+.eqz-faq h3{font-size:18px;margin-bottom:6px}
+.eqz-faq p{color:var(--eqz-ink-2);font-size:16px;max-width:52ch}
+.eqz-two .eqz-note{margin-top:16px}
+
+/* ---------------- footer ---------------- */
+.eqz-foot{border-top:1px solid var(--eqz-line);background:var(--eqz-ground-2);padding:40px 0 48px;font-size:15px;color:var(--eqz-ink-3)}
+.eqz-foot .eqz-wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px 32px}
+.eqz-foot p{max-width:64ch}
+.eqz-foot nav{display:flex;gap:22px;flex-wrap:wrap}
+.eqz-foot nav a{color:var(--eqz-ink-2)}
+@media (prefers-reduced-motion:reduce){.eqz-btn{transition:none}}
+
+/* the full-bleed wrapper is exactly one viewport wide; keep the page from scrolling sideways by a scrollbar width */
+html:has(.eqz-page),body:has(.eqz-page){overflow-x:hidden}
+
+/* ---------------- inner pages (guides, contact) ---------------- */
+.eqz-narrow{max-width:820px}
+.eqz-pagehead{padding-bottom:40px}
+.eqz-pagehead h1{font-size:clamp(32px,5vw,52px);font-weight:700;margin-bottom:14px}
+.eqz-toc{display:flex;flex-wrap:wrap;gap:10px 14px;font-family:var(--eqz-mono);font-size:13px}
+.eqz-toc a{padding:6px 12px;border:1px solid var(--eqz-line);border-radius:999px;color:var(--eqz-ink-2)}
+.eqz-toc a:hover{border-color:var(--eqz-violet);text-decoration:none;color:var(--eqz-ink)}
+.eqz-guide{padding:48px 0}
+.eqz-guide h2{font-size:clamp(24px,3vw,32px);margin-bottom:16px}
+.eqz-guide p{color:var(--eqz-ink-2);font-size:17px;max-width:70ch}
+.eqz-guide p + p{margin-top:12px}
+.eqz-guide ol{margin:0 0 16px;padding-left:22px;color:var(--eqz-ink-2);font-size:17px;max-width:70ch}
+.eqz-guide li{margin:8px 0;padding-left:4px}
+.eqz-guide li::marker{color:var(--eqz-cyan);font-family:var(--eqz-mono);font-weight:600}
+.eqz-guide b{color:var(--eqz-ink);font-weight:600}
+.eqz-contact-ways{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:8px}
+@media (max-width:720px){.eqz-contact-ways{grid-template-columns:1fr}}
+.eqz-contact-ways h3{font-size:16px;letter-spacing:.04em;text-transform:uppercase;color:var(--eqz-cyan);margin-bottom:6px}
+.eqz-contact-ways p{color:var(--eqz-ink-2);font-size:16px}
+/* the Jetpack form sits in its own group block between two HTML blocks */
+.eqz-formpage{padding:0 0 72px}
+.eqz-formpage .wp-block-jetpack-contact-form{max-width:820px;margin:0 auto;padding:0 24px;display:grid;gap:16px}
+.eqz-formpage .wp-block-jetpack-contact-form label,.eqz-formpage .jetpack-field-label__input{color:var(--eqz-ink-2)!important;font-family:var(--eqz-body);font-size:15px;font-weight:600;letter-spacing:.02em}
+.eqz-formpage .wp-block-jetpack-contact-form input:not([type=submit]),.eqz-formpage .wp-block-jetpack-contact-form textarea,.eqz-formpage .wp-block-jetpack-contact-form select{width:100%;background:var(--eqz-panel)!important;color:var(--eqz-ink)!important;border:1px solid var(--eqz-line)!important;border-radius:6px!important;padding:12px 14px!important;font-family:var(--eqz-body)!important;font-size:16px!important}
+.eqz-formpage .wp-block-jetpack-contact-form textarea{min-height:180px}
+.eqz-formpage .wp-block-jetpack-contact-form input:focus,.eqz-formpage .wp-block-jetpack-contact-form textarea:focus,.eqz-formpage .wp-block-jetpack-contact-form select:focus{outline:2px solid var(--eqz-cyan);outline-offset:2px}
+.eqz-formpage .wp-block-jetpack-contact-form .wp-block-button__link,.eqz-formpage .wp-block-jetpack-contact-form button[type=submit]{background:linear-gradient(135deg,var(--eqz-cyan),#8ab4ff 55%,var(--eqz-pink))!important;color:#0c0a1f!important;font-family:var(--eqz-display)!important;font-weight:700!important;font-size:17px!important;letter-spacing:.03em;padding:15px 26px!important;border-radius:6px!important;border:0!important;justify-self:start}
+.eqz-formpage .contact-form-submission,.eqz-formpage .form-errors{color:var(--eqz-ink);max-width:820px;margin:0 auto;padding:0 24px}
+
+/* WordPress.com: the theme paints the body white and adds a block gap between our wrappers */
+body:has(.eqz-page){background:#0c0a1f}
+.eqz-page{margin-block-start:0!important;margin-block-end:0!important}
+.eqz-formpage .wp-block-jetpack-contact-form{display:grid!important}
+.eqz-formpage .grunion-field-wrap{width:100%!important;max-width:none!important;flex:1 1 100%!important}
+.eqz-formpage .wp-block-jetpack-contact-form{grid-template-columns:1fr!important}
+
+/* ---------------- support ---------------- */
+.eqz-support-ways{display:flex;flex-direction:column;align-items:flex-start;gap:14px;justify-content:center}
+.eqz-support-note{color:var(--eqz-ink-3)!important;font-size:15px!important}
+
+/* ---------------- screenshots ---------------- */
+.eqz-shot{margin:0;border:1px solid var(--eqz-line);border-radius:10px;overflow:hidden;background:var(--eqz-panel);box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.eqz-shot img{display:block;width:100%;height:auto}
+.eqz-shot figcaption{padding:10px 14px;font-family:var(--eqz-mono);font-size:12px;line-height:1.5;color:var(--eqz-ink-3);border-top:1px solid var(--eqz-line)}
+.eqz-band{padding:0 0 64px;background:var(--eqz-ground)}
+.eqz-gallery{display:grid;grid-template-columns:minmax(0,640px) minmax(0,1fr);gap:36px;align-items:center;margin-bottom:56px}
+@media (max-width:820px){.eqz-gallery{grid-template-columns:1fr}}
+.eqz-gallery-copy h3{font-size:22px;margin-bottom:10px}
+.eqz-gallery-copy p{color:var(--eqz-ink-2);font-size:17px;max-width:46ch}
+
+.eqz-screens{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+@media (max-width:820px){.eqz-screens{grid-template-columns:1fr}}
+.eqz-screens .eqz-shot{display:block;color:inherit;text-decoration:none!important}
+.eqz-screens .eqz-shot:hover{border-color:var(--eqz-violet)}
+.eqz-screens figcaption{display:block}
+/* Screens lightbox: pure CSS via :target (WordPress.com strips scripts). A fixed :target does not
+   scroll the page; the close links go to #! so the hash clears without a jump. */
+.eqz-lb{position:fixed;top:0;right:0;bottom:0;left:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+@media (max-width:640px){.eqz-lb{padding:12px}.eqz-lb figure{width:calc(100vw - 24px)}.eqz-lb-x{top:10px;right:12px}}
+.eqz-lb:target{display:flex}
+.eqz-lb-bg{position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(6,4,20,.9);cursor:pointer}
+.eqz-lb figure{position:relative;margin:0;width:92vw;max-width:1600px;box-sizing:border-box;display:block;border:1px solid var(--eqz-line);border-radius:12px;overflow:hidden;background:var(--eqz-panel);box-shadow:0 0 0 1px rgba(94,230,255,.18),0 40px 120px rgba(0,0,0,.75)}
+.eqz-lb figure img{display:block;width:100%;height:auto;max-height:calc(90vh - 64px);object-fit:contain}
+.eqz-lb figcaption{padding:10px 14px;font-family:var(--eqz-mono);font-size:12px;line-height:1.5;color:var(--eqz-ink-3);border-top:1px solid var(--eqz-line)}
+.eqz-lb-x{position:absolute;top:16px;right:20px;z-index:2;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(11,15,26,.88);border:1px solid var(--eqz-cyan);color:var(--eqz-cyan)!important;font-size:28px;line-height:1;text-decoration:none!important}
+.eqz-lb-x:hover,.eqz-lb-x:focus-visible{background:var(--eqz-cyan);color:#0b0f1a!important;outline:2px solid #fff;outline-offset:2px}
+.eqz-lb-bg:focus-visible{outline:none}
+.eqz-support-note b{color:var(--eqz-ink)}
+</style>
+<div class="eqz-page">
+
+<header class="eqz-top">
+  <div class="eqz-wrap">
+    <a class="eqz-brand" href="https://eqzera.com/"><img src="https://raw.githubusercontent.com/Zeratfule/EQ-Zera/main/build/icon.png" alt="EQ Zera logo" width="28" height="28">EQ ZERA</a>
+    <div class="eqz-nav">
+      <a href="#features">What it does</a>
+      <a href="#install">Install</a>
+      <a href="https://eqzera.com/guides/">Guides</a>
+      <a href="#screens">Screens</a>
+      <a href="#support">Support</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://eqzera.com/contact/">Contact</a>
+      <a href="https://github.com/Zeratfule/EQ-Zera">GitHub</a>
+    </div>
+  </div>
+</header>
+
+<section class="eqz-hero">
+  <div class="eqz-wrap">
+    <div>
+      <p class="eqz-eyebrow">A desktop toolkit for EverQuest Legends</p>
+      <h1>EQ Zera</h1>
+      <h2 class="eqz-sub">The live <strong>DPS meter</strong>, floating <strong>overlays</strong> and <strong>quest tracker</strong> for EverQuest Legends.</h2>
+      <p class="eqz-sub2">It reads the log the game already writes. Nothing touches the game.</p>
+      <div class="eqz-cta">
+        <a class="eqz-btn eqz-btn-primary" href="https://github.com/Zeratfule/EQ-Zera/releases/latest/download/eq-zera-Setup.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11.2l3.6-3.6 1.4 1.4-6 6-6-6 1.4-1.4 3.6 3.6V3h2zM4 19h16v2H4z"/></svg>Download for Windows</a>
+        <a class="eqz-btn eqz-btn-ghost" href="https://github.com/Zeratfule/EQ-Zera/releases">All releases</a>
+      </div>
+      <p class="eqz-meta"><span><b>v1.26.0</b></span><span>Windows 10 / 11, 64-bit</span><span>134 MB</span><span>Free, source on GitHub</span><span>Updates itself</span></p>
+    </div>
+
+    <figure class="eqz-shot">
+      <img src="https://eqzera.com/wp-content/uploads/2026/09/quest-popup-v2.png" alt="EQ Zera quest item card over EverQuest Legends: Veeshan's Key was looted, the card names the Plane of Sky Keys quest and lights step seven" width="1290" height="930" loading="eager">
+      <figcaption>A quest item drops mid-fight. The card names the quest, its giver, and lights the step that needs it.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="eqz-band">
+  <div class="eqz-wrap">
+    <figure class="eqz-shot eqz-shot-wide">
+      <img src="https://eqzera.com/wp-content/uploads/2026/09/hero-ingame-v2.png" alt="EverQuest Legends in borderless windowed mode with the EQ Zera DPS overlay in the top right and a quest item card in the centre" width="1920" height="653" loading="lazy">
+      <figcaption>In game: the DPS overlay top right reads you and your pet live from the log; the quest card appears the moment the item is looted.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="eqz-trust">
+  <div class="eqz-wrap">
+    <div><h3>Reads your log only</h3><p>Nothing is injected into EverQuest, no game files are touched, no memory is read, nothing is automated. Type <code>/log on</code> and it has something to show.</p></div>
+    <div><h3>Nothing leaves your PC</h3><p>No telemetry endpoint is compiled in. The only network calls are the ones you can see: the EQ Legends wiki for item and mob data, and GitHub for updates.</p></div>
+    <div><h3>Source available</h3><p>The whole app, including the Rust log engine, is on GitHub under the Functional Source License. Read it, build it, file an issue.</p></div>
+  </div>
+</section>
+
+<section class="eqz-section" id="features">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">What it does</p>
+    <h2>A DPS meter, overlays, quest and loot tracking for EverQuest Legends</h2>
+    <p class="eqz-lede">EQ Zera watches the log file EverQuest Legends writes and turns every line into something you can act on while you play. Per character, per fight, per zone.</p>
+    <div class="eqz-gallery">
+      <figure class="eqz-shot">
+        <img src="https://eqzera.com/wp-content/uploads/2026/09/overlay-live-v2.gif" alt="The EQ Zera DPS meter overlay in the corner of the EverQuest Legends screen, updating through a fight with Sister of the Spire: you and your pet listed with damage per second and totals" width="720" height="304" loading="lazy">
+        <figcaption>The overlay during a fight, as captured. Numbers move as the log lines land.</figcaption>
+      </figure>
+      <div class="eqz-gallery-copy">
+        <h3>Live from the log, over the game</h3>
+        <p>Every number on this page comes from one source: the plain-text log EverQuest Legends writes. Nothing reads the game, so nothing can break when the game patches; if the log says it, EQ Zera shows it.</p>
+      </div>
+    </div>
+    <div class="eqz-features">
+      <div class="eqz-feature"><h3>Live DPS meter</h3><p>Per-fight and per-zone damage and healing numbers with fight history. Click a fight to see every hit, miss and resist that made the number, drill into each attack and spell, and scrub a timeline of the pull. Charm pets are counted correctly.</p></div>
+      <div class="eqz-feature"><h3>Floating overlays</h3><p>Small always-on-top meters you leave over the game: damage or healing, scoped to the current fight or the whole zone, plus a farm meter with kills, XP, drops and coin per hour. Lock one and it becomes click-through.</p></div>
+      <div class="eqz-feature"><h3>Quest tracker and quest item pop-ups</h3><p>Track any EverQuest Legends quest from its page and follow its steps as a checklist. Looting an item lights its step, hailing the NPC ticks the hail, and a turn-in completes it with a card and your alert. Loot something a quest needs and a pop-up names the quest and where it starts.</p></div>
+      <div class="eqz-feature"><h3>Plane of Sky tracker</h3><p>Every class's Plane of Sky Test quests with have / need chips per item, item stats on hover, and sorting by closest to done.</p></div>
+      <div class="eqz-feature"><h3>Loot, upgrades and where to farm</h3><p>A running history of what you looted and what each item is for. Zone Loot shows every mob the wiki lists in a zone and what it drops, with an upgrade chip when a drop beats what you wear, and the Build tab lists where to farm your upgrades, zone by zone.</p></div>
+      <div class="eqz-feature"><h3>Crafting and wish lists</h3><p>What you can make from what you hold, what you are one ingredient away from, and every recipe with what you are missing. Wish-list an item and get an alert when it drops or when you enter a zone where it does.</p></div>
+      <div class="eqz-feature"><h3>Your character, in 3D</h3><p>A model of your character with race, sex and face controls for the classic races and Iksar. Preview any wearable item on it from the Gear tab or an item page, one click back to your real gear.</p></div>
+      <div class="eqz-feature"><h3>Alerts, timers and recaps</h3><p>Sound alerts for a charm break, a fading buff, a raid target dying, or any log line you write a rule for. Buff and debuff timers, XP and AA progress, raid-target history, and a death recap that says who killed you and what hit you in the last fifteen seconds.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="screens">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">The app</p>
+    <h2>Every tab, from a real session</h2>
+    <p class="eqz-lede">Captured on 2026-09-08 from a level 50 monk's log. Click any screen to open it full size.</p>
+    <div class="eqz-screens">
+      <a class="eqz-shot" href="#shot-1" aria-haspopup="dialog"><img src="https://eqzera.com/wp-content/uploads/2026/09/app-combat.png" alt="EQ Zera Combat tab: a fight against Eye of Veeshan broken down by attack and spell, DPS over time graph, procs, damage by mob and the combat log" width="1920" height="1024" loading="lazy"><figcaption>Combat. One fight, every attack and spell ranked, DPS over time, procs per minute, and the raw combat log underneath.</figcaption></a>
+      <a class="eqz-shot" href="#shot-2" aria-haspopup="dialog"><img src="https://eqzera.com/wp-content/uploads/2026/09/app-character.png" alt="EQ Zera Character tab: a 3D model of the character wearing their gear beside every equipped slot and the stats from gear" width="1920" height="1024" loading="lazy"><figcaption>Character. Your gear from one /outputfile inventory, the stats it adds up to, and the model wearing it, with race, sex and face controls.</figcaption></a>
+      <a class="eqz-shot" href="#shot-3" aria-haspopup="dialog"><img src="https://eqzera.com/wp-content/uploads/2026/09/app-quests.png" alt="EQ Zera Quests tab: quest items you hold linked to the quests that need them, and a searchable list of quests with class and start zone filters" width="1920" height="1024" loading="lazy"><figcaption>Quests. The quest items you are carrying, each linked to the quests that want it, and every quest on the wiki filtered by your classes.</figcaption></a>
+      <a class="eqz-shot" href="#shot-4" aria-haspopup="dialog"><img src="https://eqzera.com/wp-content/uploads/2026/09/app-loot.png" alt="EQ Zera Loot tab: thousands of loot events grouped by item with times looted, estimated inventory count, top source mob, zones and last looted" width="1920" height="1024" loading="lazy"><figcaption>Loot. Everything you ever looted, grouped by item, with drops per hour, the mob that drops it most, and notable pickups tied to quests.</figcaption></a>
+      <a class="eqz-shot" href="#shot-5" aria-haspopup="dialog"><img src="https://eqzera.com/wp-content/uploads/2026/09/app-maps.png" alt="EQ Zera Maps tab: the Plane of Sky map with island portals and key names labelled, and a named mob list with spawn points" width="1920" height="1024" loading="lazy"><figcaption>Maps. Zone maps with labels, portals and named mob spawn points, following the zone your log says you are in.</figcaption></a>
+    </div>
+    <div class="eqz-lb" id="shot-1" role="dialog" aria-label="Combat screenshot">
+      <a class="eqz-lb-bg" href="#!" aria-label="Close"></a>
+      <figure>
+        <img src="https://eqzera.com/wp-content/uploads/2026/09/app-combat.png" alt="EQ Zera Combat tab: a fight against Eye of Veeshan broken down by attack and spell, DPS over time graph, procs, damage by mob and the combat log" width="1920" height="1024" loading="lazy">
+        <figcaption>Combat. One fight, every attack and spell ranked, DPS over time, procs per minute, and the raw combat log underneath.</figcaption>
+      </figure>
+      <a class="eqz-lb-x" href="#!" aria-label="Close">&#215;</a>
+    </div>
+    <div class="eqz-lb" id="shot-2" role="dialog" aria-label="Character screenshot">
+      <a class="eqz-lb-bg" href="#!" aria-label="Close"></a>
+      <figure>
+        <img src="https://eqzera.com/wp-content/uploads/2026/09/app-character.png" alt="EQ Zera Character tab: a 3D model of the character wearing their gear beside every equipped slot and the stats from gear" width="1920" height="1024" loading="lazy">
+        <figcaption>Character. Your gear from one /outputfile inventory, the stats it adds up to, and the model wearing it, with race, sex and face controls.</figcaption>
+      </figure>
+      <a class="eqz-lb-x" href="#!" aria-label="Close">&#215;</a>
+    </div>
+    <div class="eqz-lb" id="shot-3" role="dialog" aria-label="Quests screenshot">
+      <a class="eqz-lb-bg" href="#!" aria-label="Close"></a>
+      <figure>
+        <img src="https://eqzera.com/wp-content/uploads/2026/09/app-quests.png" alt="EQ Zera Quests tab: quest items you hold linked to the quests that need them, and a searchable list of quests with class and start zone filters" width="1920" height="1024" loading="lazy">
+        <figcaption>Quests. The quest items you are carrying, each linked to the quests that want it, and every quest on the wiki filtered by your classes.</figcaption>
+      </figure>
+      <a class="eqz-lb-x" href="#!" aria-label="Close">&#215;</a>
+    </div>
+    <div class="eqz-lb" id="shot-4" role="dialog" aria-label="Loot screenshot">
+      <a class="eqz-lb-bg" href="#!" aria-label="Close"></a>
+      <figure>
+        <img src="https://eqzera.com/wp-content/uploads/2026/09/app-loot.png" alt="EQ Zera Loot tab: thousands of loot events grouped by item with times looted, estimated inventory count, top source mob, zones and last looted" width="1920" height="1024" loading="lazy">
+        <figcaption>Loot. Everything you ever looted, grouped by item, with drops per hour, the mob that drops it most, and notable pickups tied to quests.</figcaption>
+      </figure>
+      <a class="eqz-lb-x" href="#!" aria-label="Close">&#215;</a>
+    </div>
+    <div class="eqz-lb" id="shot-5" role="dialog" aria-label="Maps screenshot">
+      <a class="eqz-lb-bg" href="#!" aria-label="Close"></a>
+      <figure>
+        <img src="https://eqzera.com/wp-content/uploads/2026/09/app-maps.png" alt="EQ Zera Maps tab: the Plane of Sky map with island portals and key names labelled, and a named mob list with spawn points" width="1920" height="1024" loading="lazy">
+        <figcaption>Maps. Zone maps with labels, portals and named mob spawn points, following the zone your log says you are in.</figcaption>
+      </figure>
+      <a class="eqz-lb-x" href="#!" aria-label="Close">&#215;</a>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="install">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">Install</p>
+    <h2>Install EQ Zera on Windows in a minute</h2>
+    <p class="eqz-lede">A one-click, per-user install like Discord. No admin prompt, no wizard. It adds a Start menu and desktop shortcut.</p>
+    <div class="eqz-steps">
+      <div class="eqz-step"><h3>Download the installer</h3><p><a href="https://github.com/Zeratfule/EQ-Zera/releases/latest/download/eq-zera-Setup.exe">eq-zera-Setup.exe</a> is always the newest build. Requires 64-bit Windows 10 or 11.</p></div>
+      <div class="eqz-step"><h3>Run the installer</h3><p>The installer is code signed, so the Windows prompt names the publisher, Jack Thomas. If SmartScreen still shows “Windows protected your PC” while the new certificate earns its reputation, click <b>More info</b>, then <b>Run anyway</b>.</p></div>
+      <div class="eqz-step"><h3>Turn on logging in game</h3><p>In EverQuest Legends type <code>/log on</code>. The app finds your log folder on its own, usually under Daybreak Game Company, Installed Games, EverQuest Legends, Logs.</p></div>
+      <div class="eqz-step"><h3>Play</h3><p>Fight something and the meter fills in. Overlays sit over the game in windowed or borderless mode; exclusive fullscreen cannot be overlaid by anything.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="companion">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">Coming from EQ Legends Companion?</p>
+    <h2>EQ Zera continues where the EverQuest Companion app stopped</h2>
+    <div class="eqz-two">
+      <div>
+        <h3>Picks up where EQ Companion left off</h3>
+        <p>EQ Zera grew out of EQ Legends Companion, the everquest-companion project by Josh Moyers, and builds on everything it did well: the DPS meter, the overlays, the Plane of Sky tracker, loot history and alerts are all here, sharper and faster, with signed releases, a self-updater that works, and an open issue tracker.</p>
+        <p>Then it keeps going. The quest tracker, quest item pop-ups, Zone Loot, the upgrade finder, crafting, wish lists, the farm meter, death recap, the 3D character model, shareable character cards, Discord posting and the run tracker are all EQ Zera additions, and every release since is listed under <a href="#changelog">What's new</a>.</p>
+      </div>
+      <div>
+        <h3>Switching takes one install</h3>
+        <p>EQ Zera reads the same settings folder, so your alerts, sound packs, overlay positions and character history carry over on first launch. Nothing is moved or deleted; the old install keeps working if you leave it.</p>
+        <p class="eqz-note"><b>Looking for the original EQ Companion app?</b> <a href="https://github.com/jmoyers/everquest-companion/releases/latest" target="_blank" rel="noopener">Get it here.</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="trust">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">Updates and trust</p>
+    <h2>It updates itself, and it tells you the terms</h2>
+    <div class="eqz-two">
+      <div>
+        <h3>How updates work</h3>
+        <p>An installed copy checks GitHub shortly after launch and every few hours after that. When a newer build is out you get a card on the celebration overlay and a note in Preferences. Nothing downloads until you click, and a downloaded build is applied the next time you close the app.</p>
+        <p>Every download is verified against the SHA-512 in the release feed, so a corrupted or substituted file fails to install.</p>
+      </div>
+      <div>
+        <h3>What is and is not verified</h3>
+        <p>Since 1.20.1 every release carries an Authenticode signature issued through Azure Trusted Signing, with Jack Thomas as the publisher. The app refuses any update that is not signed by that publisher, so both the download and its author are verified. Right-click the installer and open Digital Signatures to check it yourself; the full statement is in the repository's SECURITY.md.</p>
+        <p>EQ Zera carries the upstream license: free to use, modify and share for non-commercial purposes, converting to MIT on the license's schedule.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="faq">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">FAQ</p>
+    <h2>Questions people ask before installing</h2>
+    <div class="eqz-faq">
+      <div><h3>Is a log parser allowed in EverQuest Legends?</h3><p>EQ Zera reads the plain-text log file the game writes when you type <code>/log on</code>. It does not read game memory, inject anything, send input, or automate play. Log parsers of this kind have been part of EverQuest for over twenty years.</p></div>
+      <div><h3>Is EQ Zera free?</h3><p>Yes. The full source is on GitHub under the Functional Source License, and there is nothing to buy, no account and no sign-in.</p></div>
+      <div><h3>Does it work on Mac or Linux?</h3><p>The installer is Windows 10 and 11 only. Players have run it under Wine and CrossOver; the engine now learns your time zone so timers are right there too, but it is not a supported platform.</p></div>
+      <div><h3>Is the installer signed?</h3><p>Yes. Releases since 1.20.1 are code signed through Azure Trusted Signing and the Windows prompt names the publisher. If SmartScreen still warns while the certificate is new, click More info, then Run anyway. The download is also verified against a SHA-512 hash before it installs.</p></div>
+      <div><h3>Do the overlays work in fullscreen?</h3><p>In windowed and borderless windowed mode, yes. Exclusive fullscreen cannot be overlaid by any program, so switch to borderless if you want meters over the game.</p></div>
+      <div><h3>Where do the item, mob and quest data come from?</h3><p>From the EQ Legends wiki, fetched on demand and cached. Quest steps for the tracker are built from the wiki's walkthrough pages.</p></div>
+      <div><h3>Does it send my data anywhere?</h3><p>No. No telemetry endpoint is compiled in. Feedback goes out only when you choose to send it, through your own mail app or a GitHub issue, and you see the report first.</p></div>
+      <div><h3>How do I report a bug or ask for a feature?</h3><p>Open a <a href="https://github.com/Zeratfule/EQ-Zera/issues">GitHub issue</a>, or use Send feedback inside the app, which fills the report in for you.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="support">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">Support</p>
+    <h2>Buy the author a coffee</h2>
+    <div class="eqz-two">
+      <div>
+        <p>EQ Zera is free and stays free. It is built and maintained by one player in the evenings, and the site, the domain and the code-signing certificate cost real money. If it has saved you a wipe or found you an upgrade, a coffee is a fine way to say so.</p>
+        <p>Donations buy nothing extra: no features are locked, no ads appear, and the app never asks.</p>
+      </div>
+      <div class="eqz-support-ways">
+        <a class="eqz-btn eqz-btn-primary" href="https://venmo.com/u/eqzera" rel="noopener">Buy me a coffee on Venmo</a>
+        <p class="eqz-support-note">Venmo <b>@eqzera</b> is the project's business profile, not a personal account. Venmo is US-only; if you are elsewhere, a kind word in the <a href="https://eqzera.com/contact/">contact form</a> is just as welcome.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="eqz-section" id="changelog">
+  <div class="eqz-wrap">
+    <p class="eqz-eyebrow">What's new</p>
+    <h2>Recent releases</h2>
+    <div class="eqz-releases">
+      <div class="eqz-release">
+        <div class="v">1.26.0<small>2026-09-19</small></div>
+        <ul>
+          <li><span class="eqz-tag eqz-tag-new">New</span>EQ Zera on your phone. Preferences, Sharing, Pair a phone shows a QR code; scan it and your phone opens a live second screen with your fight meter, run tracker, respawn and buff timers, recent events and your character.</li>
+          <li><span class="eqz-tag eqz-tag-new">New</span>It installs to the home screen like an app. Everything is encrypted on your PC before it is sent, the link holds the key, and the service that relays it cannot read it. It is off until you switch it on, and Unpair all phones kills every link.</li>
+        </ul>
+      </div>
+      <div class="eqz-release">
+        <div class="v">1.25.1<small>2026-09-13</small></div>
+        <ul>
+          <li><span class="eqz-tag eqz-tag-fixed">Fixed</span>Connect a Discord channel works when your browser was not already open. EQ Zera used to start looking for the result before the browser had told the service an attempt was under way, then report that Discord did not complete the connection while it was still going.</li>
+        </ul>
+      </div>
+      <div class="eqz-release">
+        <div class="v">1.25.0<small>2026-09-12</small></div>
+        <ul>
+          <li><span class="eqz-tag eqz-tag-new">New</span>Post celebrations to Discord. Preferences, Sharing has a switch that mirrors the celebration cards into a connected channel: level ups, boss kills, quest completions, quest items, wish-list drops and deaths, each one a checkbox.</li>
+          <li><span class="eqz-tag eqz-tag-new">New</span>Share this session. The Overview tab's Last session card has a Share button that builds a card of the session, duration, zones, kills, levels, deaths, coin, best fight and drops, to copy, save, post to Discord or paste as text.</li>
+          <li><span class="eqz-tag eqz-tag-new">New</span>Send settings to another PC. Preferences, Sync makes a 24-hour transfer code; settings are encrypted on your PC before they leave it, and the other PC imports them with the usual add-only merge.</li>
+          <li><span class="eqz-tag eqz-tag-new">New</span>Away alerts. Chosen alerts are posted to a private Discord channel in small batches once you have been away from the keyboard for a few minutes, so a raid target or a tell reaches your phone.</li>
+          <li><span class="eqz-tag eqz-tag-new">New</span>Crawl progress, estimated, in the Run tracker for dungeons with a documented rare list; and a History panel on share links that shows what changed between re-shares.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="eqz-more">Every release, with its installer, is on the <a href="https://github.com/Zeratfule/EQ-Zera/releases">GitHub releases page</a>. The app's own What's new panel shows the same notes.</p>
+  </div>
+</section>
+
+<footer class="eqz-foot">
+  <div class="eqz-wrap">
+    <p>EQ Zera is a community project and is not affiliated with Daybreak Game Company. EverQuest is a trademark of Daybreak Game Company LLC. EQ Zera™ and the EQZ mark are trademarks of Jack Thomas. Based on EverQuest Companion, copyright 2026 Josh Moyers, under the Functional Source License 1.1 (MIT future license).</p>
+    <nav>
+      <a href="https://github.com/Zeratfule/EQ-Zera">Source</a>
+      <a href="https://github.com/Zeratfule/EQ-Zera/issues">Report a bug</a>
+      <a href="https://github.com/Zeratfule/EQ-Zera/blob/main/SECURITY.md">Security</a>
+      <a href="https://github.com/Zeratfule/EQ-Zera/blob/main/LICENSE">License</a>
+    </div>
+  </div>
+</footer>
+
+</div>
