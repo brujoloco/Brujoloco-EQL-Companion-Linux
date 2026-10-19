@@ -258,11 +258,56 @@ export const THEMES: ThemeDef[] = [
   },
   {
     id: 'brujoloco',
-    name: 'Brujoloco',
+    name: 'Brujoloco (Phosphor CRT)',
     palette: {
-      bg: '#0a0e1a', paper: '#142033', ink: '#0a0e1a', text: '#e8f0ff',
-      accent: '#ff9e3d', accentHi: '#ffb866', cyan: '#3df0d0', cyanDim: '#2aa090',
-      green: '#7dff8a', amber: '#ffd23d', red: '#ff5a7a', magenta: '#c08aff'
+      bg: '#000000', paper: '#011a07', ink: '#000000', text: '#33ff66',
+      accent: '#39ff14', accentHi: '#88ffaa', cyan: '#22ff77', cyanDim: '#1abb55',
+      green: '#39ff14', amber: '#aaff33', red: '#ff3344', magenta: '#88ff66'
+    }
+  },
+  {
+    id: 'brujoloco-2',
+    name: 'Brujoloco 2 (Neon Matrix)',
+    palette: {
+      bg: '#020a02', paper: '#04180a', ink: '#020a02', text: '#aaffaa',
+      accent: '#00ff88', accentHi: '#66ffcc', cyan: '#00ffcc', cyanDim: '#00aa88',
+      green: '#39ff14', amber: '#ccff00', red: '#ff3366', magenta: '#00ffaa'
+    }
+  },
+  {
+    id: 'brujoloco-3',
+    name: 'Brujoloco 3 (Amber Terminal)',
+    palette: {
+      bg: '#0a0500', paper: '#1a0c00', ink: '#0a0500', text: '#ffcc66',
+      accent: '#ffb000', accentHi: '#ffd866', cyan: '#ff9900', cyanDim: '#cc6600',
+      green: '#ccaa00', amber: '#ffe066', red: '#ff5544', magenta: '#cc8833'
+    }
+  },
+  {
+    id: 'brujoloco-4',
+    name: 'Brujoloco 4 (Cyber Acid)',
+    palette: {
+      bg: '#02030a', paper: '#06091a', ink: '#02030a', text: '#bfffcc',
+      accent: '#00ff41', accentHi: '#66ffaa', cyan: '#00ffff', cyanDim: '#0099aa',
+      green: '#00ff41', amber: '#ffff00', red: '#ff0033', magenta: '#ff00aa'
+    }
+  },
+  {
+    id: 'brujoloco-5',
+    name: 'Brujoloco 5 (Vapor Terminal)',
+    palette: {
+      bg: '#08000f', paper: '#10041a', ink: '#08000f', text: '#7dffd4',
+      accent: '#00ff9f', accentHi: '#66ffc4', cyan: '#00f0ff', cyanDim: '#0099aa',
+      green: '#39ff14', amber: '#ffe066', red: '#ff2a6d', magenta: '#ff00aa'
+    }
+  },
+  {
+    id: 'brujoloco-6',
+    name: 'Brujoloco 6 (Toxic Green)',
+    palette: {
+      bg: '#000a00', paper: '#04140a', ink: '#000a00', text: '#9fff00',
+      accent: '#aaff00', accentHi: '#ccff66', cyan: '#66ff00', cyanDim: '#44aa00',
+      green: '#aaff00', amber: '#ddff44', red: '#ff3344', magenta: '#88dd00'
     }
   }
 ]
