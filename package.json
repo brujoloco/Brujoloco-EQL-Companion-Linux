@@ -97,7 +97,7 @@
     "esbuild": "^0.25.12",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "globals": "^15.15.0",
+    "globals": "^17.13.0",
     "json-schema-to-typescript": "^15.0.4",
     "pg": "^8.22.0",
     "playwright-core": "^1.62.1",
