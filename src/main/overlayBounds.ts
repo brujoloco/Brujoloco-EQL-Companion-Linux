@@ -135,11 +135,24 @@ const sameSpot = (a: Rectangle, b: Rectangle): boolean =>
  * Take ownership of a freshly created overlay window: remember it, and persist the USER's moves and
  * resizes off it (never one of ours — the marker above).
  *
- * The two listeners are installed here rather than in windows.ts because everything they consult is
+ * The listeners are installed here rather than in windows.ts because everything they consult is
  * here. `refitOverlay` runs after the write on purpose: the move may have carried the window onto a
  * display with a different work area, or the user may have just dragged a bottom edge that is not
  * theirs to set, and both are answered by re-deriving from the last measurement.
+ *
+ * BOTH SPELLINGS, because the two platforms name the same edges differently (measured on this
+ * machine, Electron 43 + X11, 2026-10-25: `moved` fires ZERO times on a `setBounds`, `move`
+ * fires continuously instead). Upstream — a Windows app — persists off `moved`/`resized`, the
+ * once-at-the-end spellings, which is why no build before 0.2.15 ever wrote a dragged panel's
+ * place down on Linux: the live window moved, the store never heard, and a pin's re-open (0.2.14)
+ * — or a restart — landed every panel back at its default spot. `move`/`resize` are the spellings
+ * X11 actually emits, so they are listened to too, DEBOUNCED: one drag is one write at drag end,
+ * not a store write per intermediate position, and `save` is idempotent (the `sameSpot` check on
+ * our own placements) so a drag that ends where a debounced write already put it costs nothing.
+ * The timer is cleared on close so a panel's last in-flight drag never outlives its window.
  */
+const MOVE_PERSIST_DEBOUNCE_MS = 250
+
 export function installOverlayBounds(kind: OverlayKind, w: BrowserWindow): void {
   overlayWindows.set(kind, w)
   const save = (): void => {
@@ -151,8 +164,22 @@ export function installOverlayBounds(kind: OverlayKind, w: BrowserWindow): void 
     setOverlayConfig(kind, { bounds: storedOverlayBounds(kind, b) })
     refitOverlay(kind)
   }
+  let pending: NodeJS.Timeout | null = null
+  const debounced = (): void => {
+    if (pending !== null) clearTimeout(pending)
+    pending = setTimeout(() => {
+      pending = null
+      save()
+    }, MOVE_PERSIST_DEBOUNCE_MS)
+  }
   w.on('moved', save)
   w.on('resized', save)
+  w.on('move', debounced)
+  w.on('resize', debounced)
+  w.on('closed', () => {
+    if (pending !== null) clearTimeout(pending)
+    pending = null
+  })
 }
 
 /**

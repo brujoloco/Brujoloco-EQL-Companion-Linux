@@ -225,3 +225,116 @@ export function stopOverlayHover(): void {
   for (const kind of OVERLAY_KINDS) publishedZones[kind] = []
   clearHoverZones()
 }
+
+// ---- THE LINUX EDITION'S OWN HOVER SENSOR (0.2.5, 2026-10-25) ---------------------------
+//
+// WHY THIS EXISTS. The hookless hover sensor's loop is the WORKER's on Windows —
+// `GetCursorInfo` against the zones `zonesFor` derives, ~32 times a second — and the
+// worker is user32 FFI that cannot load on Linux (`native-unavailable`). So a LOCKED
+// overlay on Linux has had no sensor since the port: the renderer's `hovering` waits on
+// an `overlay:hover` edge that only `onTransition` sends, which only the worker fed. Pin
+// once and the unlock pin could never appear — in 0.1.0 exactly as in every build since,
+// because the window is click-through and no DOM event can reach it (JOS-358's note in
+// useOverlayChrome.ts states the whole shape).
+//
+// THE 0.2.2 LESSON, LEARNED (this file's own history, withdrawn same day): that poll
+// watched the CHROME STRIP ONLY — the 40 px header band — and a pointer jittering near
+// the band's edge flapped enter/leave at its 100 ms cadence, so the pin appeared "after
+// hovering several times". THIS poll watches THE WHOLE WINDOW, the way the worker's
+// WHOLE_WINDOW_KINDS zones already do: the pointer is over the meter or it is not, and
+// there is no strip boundary under the pointer's path to cross and uncross. Over the
+// window, the header reveals and STAYS revealed while the pointer is anywhere on it.
+//
+// DIVISION OF LABOR, UNCHANGED FROM THE WORKER'S: the poll feeds `onTransition` —
+// an ENTER opens the door (`setIgnoreMouseEvents(false)` — a Linux click-through window
+// DOES receive real mouse events once it stops ignoring them) and pushes the edge; a LEAVE
+// only reports, and the RENDERER decides when the mouse goes back (rule 4). The renderer
+// is untouched: its `sensor` reason arrives over the same IPC channel as before, and its
+// own capture bookkeeping keeps owning `hovering` once it has the mouse.
+//
+// SAME ZONES, ONE SENSOR, NO RACE: `zonesFor` gates on lock/open/visible/un-parked, so
+// an unpinned overlay — whose renderer already receives DOM events — publishes no
+// zones from this poll either (its `alive` windows publish `[]` via the same
+// `overlayWantsHoverZones` predicate the worker used). No second opinion exists about
+// which window has the mouse.
+
+/** The poll period. The worker's 32 ms existed to keep ITS syscall off main's thread;
+ *  a reveal has never needed to beat a tenth of a second, and this is two cheap reads. */
+export const HOVER_POLL_MS = 100
+
+
+/**
+ * THE WHOLE WINDOW as the one zone, in the physical px the cursor read answers —
+ * THE 0.2.2 LESSON APPLIED: not the 40 px chrome strip, whose band edge sat under the
+ * pointer's path and flapped enter/leave at the poll's cadence; the window's own rect
+ * has no boundary for the pointer to cross on its way to the header.
+ */
+function wholeWindowPhysicalRect(w: BrowserWindow, point: { x: number; y: number }): boolean {
+  let rect: ZoneRect = w.getBounds()
+  try {
+    rect = screen.dipToScreenRect(null, w.getBounds())
+  } catch {
+    // A display that will not convert answers in DIP, which at 100 % on the primary
+    // monitor IS physical — the same identity `toPhysical` falls back to.
+  }
+  return (
+    point.x >= rect.x &&
+    point.x < rect.x + rect.width &&
+    point.y >= rect.y &&
+    point.y < rect.y + rect.height
+  )
+}
+
+let hoverPollTimer: NodeJS.Timeout | null = null
+const hoverInside: Record<string, boolean> = {}
+
+/**
+ * Start the poll. Edges only on change, initialized to the honest OUTSIDE baseline — a
+ * boot with the pointer already over a locked panel still gets its ENTER on the first
+ * tick, and a boot elsewhere pays one silent tick and then silence.
+ */
+export function startOverlayHoverPoll(o: {
+  enabled: boolean
+  intervalMs?: number
+  onEdge?: (kind: string, inside: boolean) => void
+}): void {
+  if (hoverPollTimer !== null) return
+  if (!o.enabled) return
+  const onEdge = o.onEdge ?? onTransition
+  const tick = (): void => {
+    let point: { x: number; y: number }
+    try {
+      point = screen.dipToScreenPoint(screen.getCursorScreenPoint())
+    } catch {
+      // A display that will not answer a cursor read is one skipped tick.
+      return
+    }
+    for (const kind of HOVER_KINDS) {
+      const w = getOverlayWindow(kind)
+      if (!w || w.isDestroyed()) continue
+      // `zonesFor`'s gate, restated for the whole-window zone: a kind that wants
+      // nothing (unlocked, hidden, parked) is not sensed here either.
+      const wants = overlayWantsHoverZones({
+        locked: getOverlayConfig(kind).locked,
+        alive: true,
+        visible: w.isVisible() && !E2E,
+        parked: overlaysParked()
+      })
+      const was = hoverInside[kind] ?? false
+      const inside = wants && wholeWindowPhysicalRect(w, point)
+      if (was === inside) continue
+      hoverInside[kind] = inside
+      onEdge(kind, inside)
+    }
+  }
+  hoverPollTimer = setInterval(tick, o.intervalMs ?? HOVER_POLL_MS)
+  // A hover poll must never be the reason the app stays alive at quit.
+  hoverPollTimer.unref?.()
+}
+
+/** Stop the poll. Idempotent; on both quit paths beside the worker's own stop. */
+export function stopOverlayHoverPoll(): void {
+  if (hoverPollTimer !== null) clearInterval(hoverPollTimer)
+  hoverPollTimer = null
+  for (const kind of HOVER_KINDS) hoverInside[kind] = false
+}

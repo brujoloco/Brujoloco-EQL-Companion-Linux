@@ -172,7 +172,7 @@ test('the embed is the card, in text: title, the lines under it, the kind colour
   assert.equal(embed.title, 'Quest complete: Test of Sacrifice')
   assert.equal(embed.description, 'Plane of Sky\nShroud of Veeshan\nQuest: Test of Sacrifice\nQuest: Trial of Fear')
   assert.equal(embed.color, CELEBRATION_EMBED_COLOR.skyQuestComplete)
-  assert.equal(embed.footer.text, 'EQ Zera · eqzera.com')
+  assert.equal(embed.footer.text, 'Brujoloco EQL')
   assert.equal(embed.timestamp, new Date(at).toISOString())
   assert.deepEqual(embed.fields, [])
   assert.equal(embed.image, undefined, 'an eqimg:// icon is not reachable by Discord')

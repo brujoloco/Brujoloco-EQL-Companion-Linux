@@ -224,7 +224,7 @@ for (const cue of CUES) {
 }
 const manifest = {
   id: PACK_ID,
-  name: 'EQ Zera Console',
+  name: 'Brujoloco EQL Console',
   license: 'CC0-1.0 (original, synthesized by scripts/gen-sounds.mts)',
   sounds
 }

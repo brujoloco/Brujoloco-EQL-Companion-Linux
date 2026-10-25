@@ -188,15 +188,15 @@ test('the verdict does not consult `enabled` - being away is a fact about the ma
 
 test('the embed names itself, its footer and the LAST firing`s instant', () => {
   const embed = embedOf([item('Slow', 'a', 1_000), item('Mez', 'b', 9_000)])
-  assert.equal(embed.title, 'EQ Zera · while you were away')
-  assert.equal(embed.footer.text, 'EQ Zera · eqzera.com')
+  assert.equal(embed.title, 'Brujoloco EQL · while you were away')
+  assert.equal(embed.footer.text, 'Brujoloco EQL')
   assert.equal(embed.color, 0xffc857)
   assert.equal(embed.timestamp, new Date(9_000).toISOString())
 })
 
 test('the body wears this app`s own bot identity and carries no content line', () => {
   const body = awayAlertBody([item('Slow', 'a', 1)])
-  assert.equal(body.username, 'EQ Zera')
+  assert.equal(body.username, 'Brujoloco EQL')
   assert.equal(body.content, '')
   assert.equal(body.embeds.length, 1)
 })

@@ -39,10 +39,12 @@ import {
   getOverlayWindow,
   isOverlayOpen,
   overlayStateMap,
+  remapOverlayPinned,
   setOverlayIgnoreMouse,
   setOverlayOpen
 } from '../windows'
 import { OVERLAY_KINDS, TEXT_SCALE_DEFAULT } from '../../shared/types'
+import { unlockAllOverlays } from '../../shared/overlayUnlockAll'
 import type { AppFocus, AppFocusView, OverlayConfig, OverlayKind } from '../../shared/types'
 
 /**
@@ -227,6 +229,41 @@ function onFocusViewAsk(focus: AppFocus): void {
   w.webContents.send(IPC.onFocusView, sanitizeFocus(focus))
 }
 
+/**
+ * THE ONE PER-KIND LOCK CHANGE — persist + apply to the live window + echo + end a move.
+ *
+ * Both lock entry points walk this door: the per-panel pin (`overlay:setLocked`, from an overlay's
+ * own chrome or Preferences) and the bulk unlock (`overlay:unlockAll`, from the TitleBar menu). One
+ * writer of `locked`, two thin callers, so the four steps — store, click-through, the echo that
+ * keeps a strip's toast in step, and the move-frame teardown a lock forces — are stated once.
+ *
+ * Closed overlays persist `locked` and skip the rest: `applyOverlayLocked` returns early on a
+ * missing window, the echo's `getOverlayWindow(kind)?` is null-safe, and `endMoveIfOpened` only
+ * runs when locking — so an unlock of a closed panel is a store write and nothing else, which is
+ * exactly right (the next open reads `locked: false` and comes up interactive).
+ */
+function commitOverlayLocked(kind: OverlayKind, locked: boolean): void {
+  const next = setOverlayConfig(kind, { locked })
+  applyOverlayLocked(kind, locked)
+  getOverlayWindow(kind)?.webContents.send(IPC.onOverlayConfig, { kind, config: next })
+  // THE FRAME'S OWN DONE IS ALSO A DONE (2026-09-10). Pressing "Move this overlay" on a strip
+  // that is switched OFF opens its window for as long as the frame is up (../overlayMove.ts), and
+  // there are two buttons that end that — Preferences' Done, which goes through `overlay:move`,
+  // and the frame's, which comes here. So this path asks too, and a strip that was off is put
+  // back whichever one was pressed. A no-op in every other case, meter or strip.
+  if (locked) {
+    endMoveIfOpened(kind)
+    // 0.2.14 — THE FRESH APPEARANCE THE PIN NEVER HAD. Shaping a window the compositor has
+    // already placed never lifts it over a fullscreen game (measured twice: 0.2.8's re-show,
+    // 0.2.13's unmap+remap — the same toolkit path), so a PIN ends by destroying the open
+    // panel and re-opening it through the Overlay menu's own doors: a fresh construction,
+    // born pinned, at the persisted bounds — the restart the pin toggle used to need, one
+    // window, no app quit. Strips and closed kinds are no-ops inside (windows.ts); unlock
+    // leaves the window as it is, because an unpinned panel lives on the desktop.
+    remapOverlayPinned(kind, locked)
+  }
+}
+
 export function registerWindowIpc(): void {
   ipcMain.on(IPC.focusView, (_e, focus: AppFocus) => onFocusViewAsk(focus))
 
@@ -299,16 +336,20 @@ export function registerWindowIpc(): void {
   // (which patches its own state first), so nothing had to tell it. The celebration toast is
   // driven from PREFERENCES as well — "Move it" is in the main window — and a toast overlay
   // that never heard about the change would keep rendering as though it were still locked.
+  //
+  // The four steps live in `commitOverlayLocked` (the one per-kind writer) so the bulk unlock
+  // below reuses them rather than copying a second loop. One writer, two entry points.
   ipcMain.on(IPC.overlaySetLocked, (_e, kind: OverlayKind, locked: boolean) => {
-    const next = setOverlayConfig(kind, { locked })
-    applyOverlayLocked(kind, locked)
-    getOverlayWindow(kind)?.webContents.send(IPC.onOverlayConfig, { kind, config: next })
-    // THE FRAME'S OWN DONE IS ALSO A DONE (2026-09-10). Pressing "Move this overlay" on a strip
-    // that is switched OFF opens its window for as long as the frame is up (../overlayMove.ts), and
-    // there are two buttons that end that — Preferences' Done, which goes through `overlay:move`,
-    // and the frame's, which comes here. So this path asks too, and a strip that was off is put
-    // back whichever one was pressed. A no-op in every other case, meter or strip.
-    if (locked) endMoveIfOpened(kind)
+    commitOverlayLocked(kind, locked)
+  })
+  // "Unlock all overlay windows" (0.2.11): drop click-through on every PANEL kind at once — 0.2.12
+  // narrowed "all": the strips (con card, celebration toasts, alert banner) stay exempt, and their
+  // `locked` is never written by this path. The kind list is shared/overlayUnlockAll.ts's, and the
+  // per-kind commit is the same door above, so this is the bulk form of the per-panel pin — not a
+  // second writer of `locked`. Closed overlays persist `locked: false` and skip the apply (no live
+  // window to set), so the next open is already interactive; open ones re-apply immediately.
+  ipcMain.on(IPC.overlayUnlockAll, () => {
+    unlockAllOverlays((kind, locked) => commitOverlayLocked(kind, locked))
   })
   // Fine-grained pass-through toggle: the meters' hover sensor (locked mode), and the toast
   // overlay's queue transitions (empty ⇒ pass everything through; a card on screen ⇒ capture).

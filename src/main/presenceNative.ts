@@ -98,6 +98,13 @@
 // already had.
 
 import * as koffi from 'koffi'
+// 0.2.16 — THE PLATFORM SEAM. `loadPresenceNative` below is the WIN32 surface, and the
+// Linux Edition is a native Linux process: the three loads it opens cannot be opened here,
+// which is why every build before 0.2.16 crash-looped its watcher on Linux and shipped no
+// cursor ring at all. The X11 answer lives in its own module (`presenceNativeX11.ts` —
+// koffi is its FFI engine too, and every call in it was probe-verified on this machine), and
+// the dispatcher picks by platform: the worker cannot tell the two apart.
+import { loadPresenceNativeX11 } from './presenceNativeX11'
 // The client's image name, imported rather than respelled: the running scan and the
 // "is this window EverQuest" predicate must never disagree about what the game is called.
 import { EQ_CLIENT_EXES } from './presenceProtocol'
@@ -221,7 +228,15 @@ const MAX_PIDS = 4096
  * Called from the presence WORKER only — main never loads koffi, so a failure cannot take the
  * app's own thread with it.
  */
+/** THE ONE DOOR THE WORKER OPENS. The Win32 surface on Windows; the X11 surface everywhere
+ *  else (this fork runs Linux). Same four questions, same `PresenceNative` shape. */
 export function loadPresenceNative(): PresenceNative {
+  if (process.platform !== 'win32') return loadPresenceNativeX11()
+  return loadPresenceNativeWin32()
+}
+
+/** The Win32 surface (the original `loadPresenceNative` body). */
+function loadPresenceNativeWin32(): PresenceNative {
   const user32 = koffi.load('user32.dll')
   const kernel32 = koffi.load('kernel32.dll')
   const psapi = koffi.load('psapi.dll')

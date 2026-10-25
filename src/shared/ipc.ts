@@ -206,6 +206,11 @@ export const IPC = {
   onOverlayState: 'overlay:state',
   // renderer(overlay) -> main: set click-through (locked) vs interactive. Args: kind, locked.
   overlaySetLocked: 'overlay:setLocked',
+  // renderer(main app) -> main: the "Unlock all overlay windows" menu action (0.2.11) — drop
+  // click-through on every PANEL kind at once (0.2.12: the strips stay exempt — see
+  // shared/overlayUnlockAll.ts). No args: the kind list is main's, not the
+  // renderer's, and the per-kind commit is the same door `overlay:setLocked` walks one at a time.
+  overlayUnlockAll: 'overlay:unlockAll',
   // renderer(overlay) -> main: fine-grained mouse-event pass-through toggle used by the
   // hover sensor while locked. Args: kind, ignore (true = pass through, false = capture).
   overlaySetIgnoreMouse: 'overlay:setIgnoreMouse',

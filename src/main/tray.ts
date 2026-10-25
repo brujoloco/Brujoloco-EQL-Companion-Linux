@@ -43,8 +43,9 @@ import { join } from 'path'
 // `readFile('build/icon.png')` would resolve in dev and find nothing in a packaged app. The
 // `?asset` import hands the file to electron-vite's asset pipeline, which emits it beside the main
 // bundle and rewrites this to the emitted path — so it ships with no electron-builder change.
-// The tray mark is drawn at its own size (build/icon-tray.png, scripts/gen-icon.mts): crushing the
-// 256px master to 16px in one step turned the letters into a blob. Windows scales this per DPI.
+// The tray mark is the wizard emoji too (0.2.21, the owner's pick of the options offered): a
+// committed 32px render of the same glyph the window mark carries, drawn AT its own size by
+// this repo's Chromium rather than crushed from the 256 master. Windows scales this per DPI.
 import trayIconAsset from '../../build/icon-tray.png?asset'
 import { IPC } from '../shared/ipc'
 import {

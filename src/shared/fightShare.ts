@@ -386,7 +386,7 @@ export function discordFightEmbed(f: FightShare, cardAttached: boolean): Discord
     color: FIGHT_EMBED_COLOR,
     ...(cardAttached ? { image: { url: `attachment://${FIGHT_CARD_FILE}` } } : {}),
     fields: fightFields(f),
-    footer: { text: cut('EQ Zera · eqzera.com', DISCORD_LIMIT.footer) },
+    footer: { text: cut('Brujoloco EQL', DISCORD_LIMIT.footer) },
     timestamp: new Date(f.startedAt > 0 ? f.startedAt : Date.now()).toISOString()
   }
   return discordPostBody(embed)

@@ -219,7 +219,7 @@ test('the History panel sits below Worn gear, newest first, with the delta again
   const html = page([snapshot()], current)
   assert.ok(html.includes('<h2>History</h2>'))
   assert.ok(html.indexOf('<h2>Worn gear</h2>') < html.indexOf('<h2>History</h2>'), 'below the gear it explains')
-  assert.ok(html.indexOf('<h2>History</h2>') < html.indexOf('<h2>Open this in EQ Zera</h2>'))
+  assert.ok(html.indexOf('<h2>History</h2>') < html.indexOf('<h2>Open this in Brujoloco EQL</h2>'))
   assert.ok(html.includes(`<p class="when">${new Date(T0 - DAY).toISOString().slice(0, 10)}</p>`))
   assert.ok(
     html.includes('<span class="k">AC</span><span class="v">231 → 247</span><span class="d up">+16</span>'),

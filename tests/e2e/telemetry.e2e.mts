@@ -461,7 +461,7 @@ async function stepCollects(page: Page): Promise<void> {
   // the flush gate on its own (plan T7). A `lastBatch` here would mean the harness had reached
   // the live ingest API behind the test's back.
   check(
-    'the running build has NO telemetry endpoint (EQ Zera fork is dark)',
+    'the running build has NO telemetry endpoint (Brujoloco EQL fork is dark)',
     p.endpointConfigured === false,
     `endpointConfigured=${String(p.endpointConfigured)}`
   )

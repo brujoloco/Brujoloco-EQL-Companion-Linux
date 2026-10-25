@@ -30,7 +30,7 @@ export function AboutBuildSetting(): JSX.Element {
         }}
       />
       <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: '0.04em' }}>
-        Brujoloco EQL Companion — Linux Edition
+        Brujoloco EQL Companion - Linux Edition
       </Typography>
       <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: '0.08em' }}>
         Build date: {ABOUT_BUILD_DATE}
@@ -39,7 +39,7 @@ export function AboutBuildSetting(): JSX.Element {
       <Typography variant="body2">
         This is a full rework of the old EQ Zera version into{' '}
         <strong>Brujoloco EQL Companion</strong>, keeping almost every change EQ Zera
-        introduced and adding new ones — like the theme section you are reading this in.
+        introduced and adding new ones - like the theme section you are reading this in.
       </Typography>
 
       <Typography variant="body2">
@@ -65,12 +65,12 @@ export function AboutBuildSetting(): JSX.Element {
         }}
       >
         EverQuest has been my home for a long, long time. Norrath is where I&rsquo;ve spent more
-        evenings than I can count — raiding with friends I still talk to, watching the sun rise
+        evenings than I can count - raiding with friends I still talk to, watching the sun rise
         over the Karanas, losing myself in a zone I already knew by heart and somehow finding
         one more thing I&rsquo;d missed. This app is a love letter to that. It doesn&rsquo;t
         play the game for me; it just watches the log the game already writes and turns it into
         the numbers and the cards I want to see while I&rsquo;m playing. May your pulls be
-        clean and your loot be kind. — Brujoloco
+        clean and your loot be kind. - Brujoloco
       </Typography>
 
       <Box

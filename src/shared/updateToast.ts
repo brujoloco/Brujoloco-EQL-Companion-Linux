@@ -64,7 +64,7 @@ export function updateToastId(version: string | undefined): string {
 
 /** The build, as the card names it. A version we were not told is still an update worth offering. */
 function buildName(version: string | undefined): string {
-  return version?.trim() ? `EQ Zera ${version.trim()}` : 'The EQ Zera update'
+  return version?.trim() ? `Brujoloco EQL ${version.trim()}` : 'The Brujoloco EQL update'
 }
 
 /** Every card is built through this, so the kind, the id and the hold cannot drift apart. */

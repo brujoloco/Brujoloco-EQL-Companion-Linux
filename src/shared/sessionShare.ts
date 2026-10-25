@@ -556,7 +556,7 @@ export function discordSessionEmbed(s: SessionShare, cardAttached: boolean): Dis
     color: SESSION_EMBED_COLOR,
     ...(cardAttached ? { image: { url: `attachment://${SESSION_CARD_FILE}` } } : {}),
     fields: sessionFields(s),
-    footer: { text: cut('EQ Zera · eqzera.com', DISCORD_LIMIT.footer) },
+    footer: { text: cut('Brujoloco EQL', DISCORD_LIMIT.footer) },
     timestamp: new Date(s.t1 > 0 ? s.t1 : Date.now()).toISOString()
   }
   return discordPostBody(embed)

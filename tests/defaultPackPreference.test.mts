@@ -64,7 +64,7 @@ const SHIPPED = pack(
     DEFAULT_ALERT_SOUNDS.questComplete,
     DEFAULT_ALERT_SOUNDS.buffWearsOff
   ],
-  'EQ Zera Console'
+  'Brujoloco EQL Console'
 )
 
 /** A third-party pack with its own derived ids in the same CESP categories. */

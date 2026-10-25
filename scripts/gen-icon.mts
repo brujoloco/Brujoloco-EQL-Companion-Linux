@@ -3,10 +3,19 @@
 //   export PATH="/c/Program Files/nodejs:$PATH"   # this machine
 //   npx tsx scripts/gen-icon.mts        # or: npm run gen:icon
 //
-// Outputs build/icon.png (256x256 — the tray art today, and the Linux/reference art),
-// build/icon-tray.png (32x32, see below) and build/icon.ico (the Windows exe + NSIS
-// installer icon electron-builder consumes). The .ico embeds PNG-compressed frames at
-// 256/128/64/48/32/16 px; Vista+ and NSIS both read PNG-in-ICO, so no legacy BMP frames.
+// Outputs build/icon.ico (the Windows exe + NSIS installer icon electron-builder consumes).
+// The .ico embeds PNG-compressed frames at 256/128/64/48/32/16 px; Vista+ and NSIS both read
+// PNG-in-ICO, so no legacy BMP frames.
+//
+// 0.2.20 — THIS SCRIPT NO LONGER WRITES build/icon.png. The window/taskbar mark is
+// the wizard emoji (the owner's ask, rendered from Noto Color Emoji by this repo's own
+// Chromium — a font rasterization a zero-dependency script cannot do), so icon.png is
+// a COMMITTED ASSET now and this script writing it back would clobber it.
+//
+// 0.2.21 — NOR build/icon-tray.png: the owner chose the emoji for the tray too (option A,
+// 32px, palette-verified against the 256px master), so BOTH PNGs are committed assets
+// and this script's only output is the Windows .ico — the one surface that keeps the
+// cartridge badge, on a platform this Linux Edition does not ship.
 //
 // THE MARK (EQ Zera, 2026-09-08 — replaces the inherited "rounded dark panel + serif EQ",
 // which read as a generic companion app). A RETRO-WAVE CARTRIDGE BADGE: a chamfered plate
@@ -482,23 +491,14 @@ const outDir = join(here, '..', 'build')
 mkdirSync(outDir, { recursive: true })
 
 const master = render(256)
-const masterPng = encodePng(master)
-writeFileSync(join(outDir, 'icon.png'), masterPng)
-
-// THE TRAY FRAME, drawn at its own size. `src/main/tray.ts` today does
-// `nativeImage.createFromPath(icon.png).resize({ width: 16, height: 16 })` — a 16:1 downscale of
-// the 256 master, which averages the letters into one bright blob (see the -tray-16 preview).
-// This is the same mark drawn at 32px with pixel-snapped 2px strokes, so the notification area
-// gets a legible "EQZ". Wiring it up is a one-line import change in tray.ts.
-writeFileSync(join(outDir, 'icon-tray.png'), encodePng(render(32)))
+// 0.2.20: no icon.png write — see the header. `master` stays for the .ico's 256 frame.
 
 const sizes = [256, 128, 64, 48, 32, 16]
 const frames = sizes.map((size) => ({ size, png: encodePng(size === 256 ? master : render(size)) }))
 const ico = buildIco(frames)
 writeFileSync(join(outDir, 'icon.ico'), ico)
 
-console.log(`wrote build/icon.png (${masterPng.length} bytes, 256x256) + build/icon-tray.png (32x32)`)
-console.log(`wrote build/icon.ico (${ico.length} bytes, frames: ${sizes.join('/')})`)
+console.log(`wrote build/icon.ico (${ico.length} bytes, frames: ${sizes.join('/')}) — icon.png and icon-tray.png untouched (the committed wizard marks)`)
 
 const previewDir = process.env.EQ_ICON_PREVIEW
 if (previewDir !== undefined && previewDir !== '') {

@@ -154,7 +154,7 @@ const CARD = 'https://share.eqzera.com/c/aB3xY9kQ2m.png?v=1757500000000'
 
 test('the embed wraps the link and states who it is about', () => {
   const body = discordEmbedFor(PROFILE, LINK, CARD)
-  assert.equal(body.username, 'EQ Zera')
+  assert.equal(body.username, 'Brujoloco EQL')
   assert.equal(body.avatar_url, 'https://share.eqzera.com/logo.png')
   // THE EMBED IS THE MESSAGE. A line above it would be the same facts twice.
   assert.equal(body.content, '')
@@ -165,7 +165,7 @@ test('the embed wraps the link and states who it is about', () => {
   assert.equal(embed.url, LINK)
   assert.equal(embed.image.url, CARD)
   assert.equal(embed.color, 0x5ee6ff)
-  assert.equal(embed.footer.text, 'EQ Zera · eqzera.com')
+  assert.equal(embed.footer.text, 'Brujoloco EQL')
   assert.equal(embed.timestamp, new Date(PROFILE.capturedAt).toISOString())
 })
 
@@ -252,8 +252,8 @@ test('a body with no capture instant still carries a timestamp Discord can read'
 
 test('the Test message is one plain line and carries no profile at all', () => {
   const body = discordTestBody()
-  assert.equal(body.username, 'EQ Zera')
-  assert.equal(body.content, 'EQ Zera connected. Character cards you post will appear here.')
+  assert.equal(body.username, 'Brujoloco EQL')
+  assert.equal(body.content, 'Brujoloco EQL connected. Character cards you post will appear here.')
   // A connection test that also published somebody's gear would be a surprise.
   assert.equal((body as { embeds?: unknown }).embeds, undefined)
 })

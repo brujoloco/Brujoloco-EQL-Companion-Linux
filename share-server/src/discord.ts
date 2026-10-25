@@ -110,7 +110,7 @@ function noticePage(title: string, body: string, status = 200): Response {
   const html =
     `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
     `<meta name="viewport" content="width=device-width,initial-scale=1">` +
-    `<title>${esc(title)} · EQ Zera</title>` +
+    `<title>${esc(title)} · Brujoloco EQL</title>` +
     `<style nonce="${esc(nonce)}">` +
     `body{margin:0;background:#0c0a1f;color:#efeaff;font-family:'Source Sans 3','Segoe UI',system-ui,sans-serif;font-size:17px;line-height:1.55}` +
     `.wrap{max-width:560px;margin:0 auto;padding:64px 20px}` +
@@ -118,7 +118,7 @@ function noticePage(title: string, body: string, status = 200): Response {
     `background:linear-gradient(180deg,#fff 0%,#c7a2ff 60%,#ff5fb8 100%);-webkit-background-clip:text;background-clip:text;color:transparent}` +
     `p{margin:0 0 10px}.muted{color:#7d75a6;font-size:15px}` +
     `</style></head><body><div class="wrap"><h1>${esc(title)}</h1><p>${body}</p>` +
-    `<p class="muted">EQ Zera</p></div></body></html>`
+    `<p class="muted">Brujoloco EQL</p></div></body></html>`
   const base = htmlResponse(html, nonce)
   return new Response(html, { status, headers: base.headers })
 }
@@ -126,7 +126,7 @@ function noticePage(title: string, body: string, status = 200): Response {
 function expiredPage(): Response {
   return noticePage(
     'This link has expired',
-    'The connection request is no longer open. Close this tab and start again from EQ Zera.',
+    'The connection request is no longer open. Close this tab and start again from Brujoloco EQL.',
     400
   )
 }
@@ -138,7 +138,7 @@ function cancelledPage(): Response {
 function failedPage(): Response {
   return noticePage(
     'Not connected',
-    'Discord did not complete the connection. Close this tab and try again in EQ Zera.',
+    'Discord did not complete the connection. Close this tab and try again in Brujoloco EQL.',
     502
   )
 }
@@ -147,7 +147,7 @@ function connectedPage(channelName: string | undefined): Response {
   const where = channelName !== undefined ? ` to <strong>#${esc(channelName)}</strong>` : ''
   return noticePage(
     'Connected',
-    `EQ Zera can now post${where}. You can close this tab and go back to EQ Zera.`
+    `Brujoloco EQL can now post${where}. You can close this tab and go back to Brujoloco EQL.`
   )
 }
 

@@ -123,9 +123,6 @@ const TAIL_COLOR = 'rgba(255,255,255,0.7)'
 type HeaderCapture = (reason: CaptureReason, active: boolean) => void
 const NO_CAPTURE: HeaderCapture = () => undefined
 
-/** The IconButton's box (IconButton.tsx: 20 x 20), so the slot below can hold its shape. */
-const CONTROL_PX = 20
-
 /**
  * Lock/close, shown when interactive or while a locked overlay has captured the mouse.
  *
@@ -200,20 +197,25 @@ function HeaderControls({
   chrome,
   iconAccentBg
 }: {
-  chrome: Pick<OverlayChrome, 'locked' | 'hovering' | 'noDrag' | 'toggleLock'>
+  chrome: Pick<OverlayChrome, 'locked' | 'noDrag' | 'toggleLock'>
   iconAccentBg: string
 }): JSX.Element | null {
-  const { locked, hovering, noDrag, toggleLock } = chrome
-  if (locked && !hovering) {
-    return <div aria-hidden style={{ width: CONTROL_PX, height: CONTROL_PX, marginLeft: 2, flexShrink: 0 }} />
-  }
+  const { locked, noDrag, toggleLock } = chrome
+  // 0.2.11 — THE PIN IS ALWAYS HERE, WITH A BACKGROUND. The hover-ghost placeholder is
+  // gone: a PINNED panel is the one that composites over the fullscreen game (measured,
+  // 2026-10-25 — click-through is the property that lands a window above wine's fullscreen
+  // client), so the pin is the panel's primary control and it must never depend on a
+  // hover reveal the click-through state cannot deliver. It is SOLID so it reads as
+  // present on the panel at all times; the whole-window sensor (0.2.10) opens the door
+  // the moment the pointer arrives, so it is clickable exactly when it is visible.
   return (
     <div style={{ ...noDrag, display: 'flex', alignItems: 'center', gap: 2, marginLeft: 2, flexShrink: 0 }}>
       <IconButton
-        label={locked ? 'Unlock (interactive)' : 'Lock (click-through)'}
+        label={locked ? 'Unlock (interactive)' : 'Pin (show over the game)'}
         onClick={toggleLock}
         accent={locked}
         accentBg={iconAccentBg}
+        background={locked ? iconAccentBg : 'rgba(255,255,255,0.18)'}
       >
         {locked ? '🔓' : '📌'}
       </IconButton>

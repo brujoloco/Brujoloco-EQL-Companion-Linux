@@ -20,7 +20,8 @@ export function IconButton({
   danger,
   accent,
   testId,
-  accentBg = ICON_ACCENT_VIOLET
+  accentBg = ICON_ACCENT_VIOLET,
+  background
 }: {
   onClick: () => void
   /** The accessible NAME of the button - never a tooltip (owner ruling 2026-08-16: no hover text anywhere on an overlay). */
@@ -32,6 +33,11 @@ export function IconButton({
    *  control is found by name, because two kinds may spell theirs with the same glyph. */
   testId?: string
   accentBg?: string
+  /** A RESTING background for the button box (Linux Edition 0.2.11): the pin control is
+   *  solid so it reads as present on a click-through panel — the one control that must
+   *  never depend on a hover the click-through state cannot deliver. Default: the accent
+   *  tint when `accent`, else transparent, exactly as before. */
+  background?: string
 }): JSX.Element {
   return (
     <button
@@ -50,12 +56,12 @@ export function IconButton({
         cursor: 'pointer',
         fontSize: 11,
         lineHeight: 1,
-        background: accent ? accentBg : 'transparent',
+        background: background ?? (accent ? accentBg : 'transparent'),
         color: danger ? PALETTE.red : 'inherit',
         padding: 0
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = accent ? accentBg : 'transparent')}
+      onMouseEnter={(e) => (e.currentTarget.style.background = background ?? 'rgba(255,255,255,0.14)')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = background ?? (accent ? accentBg : 'transparent'))}
     >
       {children}
     </button>

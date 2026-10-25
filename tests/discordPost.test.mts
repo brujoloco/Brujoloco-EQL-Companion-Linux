@@ -173,8 +173,8 @@ test('the Test button posts one plain line and no embed', async () => {
   const { deps, calls } = fakeFetch(204)
   assert.deepEqual(await testDiscordWebhook(HOOK, deps), { ok: true })
   const body = calls[0]?.body as { username: string; content: string; embeds?: unknown }
-  assert.equal(body.username, 'EQ Zera')
-  assert.equal(body.content, 'EQ Zera connected. Character cards you post will appear here.')
+  assert.equal(body.username, 'Brujoloco EQL')
+  assert.equal(body.content, 'Brujoloco EQL connected. Character cards you post will appear here.')
   assert.equal(body.embeds, undefined)
 })
 
@@ -375,7 +375,7 @@ test('the payload_json part parses back to the embed that was handed over', asyn
     username: string
     embeds: { title: string; image?: { url: string } }[]
   }
-  assert.equal(sent.username, 'EQ Zera')
+  assert.equal(sent.username, 'Brujoloco EQL')
   assert.equal(sent.embeds[0]?.title, 'a dark elf priest · 1:06 · 48,204 damage')
   assert.deepEqual(sent.embeds[0]?.image, { url: 'attachment://fight.png' })
 })

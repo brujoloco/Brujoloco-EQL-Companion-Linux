@@ -19,7 +19,7 @@
 // to Electron: the shared webPreferences object and the per-webContents / per-session
 // hardening that installs those predicates.
 
-import { BrowserWindow, shell } from 'electron'
+import { BrowserWindow, nativeImage, shell } from 'electron'
 import { join } from 'path'
 import { IPC } from '../shared/ipc'
 // The mouse's Back button (JOS-201). Its own module, and never installed per-overlay — the
@@ -58,6 +58,14 @@ import { allowedExternalUrl, isInternalPageUrl } from './security'
 // below: it answers whether this close is really a hide to the tray, and does the hiding itself.
 // The policy behind it is pure (shared/closeToTray.ts); the icon and the popover are tray.ts.
 import { hideMainWindowToTray } from './tray'
+// 0.2.20 — THE TASKBAR MARK, through the build (the tray's own pattern, tray.ts). The wizard
+// emoji is a COMMITTED ASSET (build/icon.png — rendered from Noto Color Emoji by this repo's
+// own Chromium, because a font rasterization is the one thing a zero-dependency generator
+// cannot do), and the `?asset` import hands it to electron-vite's asset pipeline, which emits
+// it beside the main bundle and rewrites this to the emitted path — so it ships with no
+// electron-builder change. A NATIVEIMAGE, not a path string (see createMainWindow — the
+// asar lesson) — and _NET_WM_ICON, what the taskbar actually shows, is set from it.
+import windowIconAsset from '../../build/icon.png?asset'
 import { captureMainWindowErrors, forwardConsoleMessages } from './windowErrors'
 import { resolvedGraphics } from './graphics'
 // The z-order guard and its ONE exception (JOS-368). Every re-assert in this file goes through
@@ -374,6 +382,22 @@ export function createMainWindow(): void {
     frame: false,
     title: 'Brujoloco EQL Companion',
     backgroundColor: PALETTE.bg,
+    // THE TASKBAR ICON (0.2.20): the wizard emoji, not Electron's default mark. On Linux
+    // this is what _NET_WM_ICON carries and what the taskbar shows — and it must be a
+    // NATIVEIMAGE (the tray's own lesson): the emitted PNG lives inside the asar, a bare path
+    // string hands Chromium a file it cannot read and the window ships with NO icon at all,
+    // while `nativeImage.createFromPath` reads through the asar — which is why the tray icon
+    // has always worked this way. Measured: 0.2.20's first build set the string and the live
+    // window carried an empty _NET_WM_ICON (xprop, 2026-10-25).
+    //
+    // …AND THE RESIZE IS MEASURED TOO, not taste: at 256 this window-manager family lands an
+    // EMPTY _NET_WM_ICON (probe: 256 → empty, 48 → 48×48, 64 → 64×64, same image, same options)
+    // — so the committed 256 mark stays the desktop/installer art (electron-builder icon:) and
+    // the WINDOW carries it at 64, the largest size that verifiably lands. The taskbar draws it
+    // at its own 32-ish px either way.
+    icon: nativeImage
+      .createFromPath(windowIconAsset)
+      .resize({ width: 64, height: 64 }),
     webPreferences: {
       ...WEB_PREFERENCES(join(__dirname, '../preload/index.js')),
       // THE TEXT SIZE, APPLIED BEFORE THE FIRST PAINT (JOS-123). Not a second opinion about the
@@ -871,6 +895,12 @@ export function createOverlayWindow(kind: OverlayKind): void {
       applyOverlayLocked(kind, getOverlayConfig(kind).locked)
       return
     }
+    // 0.2.13 — BORN IN ITS PINNED SHAPE, before the first map. The lock used to be applied
+    // AFTER `showInactive()`, so a window opened while the game owned the screen was mapped
+    // interactive and no later restack ever lifted it (the 0.2.9 law: a fresh map lands above
+    // a fullscreen client, a restack of a mapped one never does). Applying it before the map
+    // makes a fresh open the same fresh appearance a restart used to be the only way to get.
+    applyOverlayLocked(kind, getOverlayConfig(kind).locked)
     // showInactive so opening the overlay never steals focus from the game.
     w.showInactive()
     // A window born while the overlays are PARKED (JOS-427) is born invisible the same way its
@@ -878,7 +908,6 @@ export function createOverlayWindow(kind: OverlayKind): void {
     // back in the game, exactly as the already-open ones will.
     w.setOpacity(parkedOpacity())
     assertTopmost(w)
-    applyOverlayLocked(kind, getOverlayConfig(kind).locked)
     raiseCursorRing()
   })
 
@@ -894,6 +923,10 @@ export function createOverlayWindow(kind: OverlayKind): void {
   installOverlaySnap(w, kind, overlayWindows, getMainWindow)
 
   w.on('closed', () => {
+    // 0.2.14's GUARD: a successor can already own the slot when this fires — the pin toggle's
+    // re-open destroys and constructs within one turn — and a late 'closed' nulling or
+    // persisting then would wipe the NEW window's registration and its open-state.
+    if (overlayWindows[kind] !== w) return
     overlayWindows[kind] = null
     // A window that is gone is nobody's hover target: the cursor watch would find out on its next
     // tick anyway (the rectangle it re-reads comes back null), but a closed window should cost
@@ -1009,6 +1042,56 @@ export function parkOverlays(parked: boolean): void {
     // IS the fix.
     setOverlayIgnoreMouse(kind, overlayDesiredIgnore[kind] ?? getOverlayConfig(kind).locked)
   }
+}
+
+/**
+ * 0.2.14 — THE PIN TOGGLE'S FRESH APPEARANCE. The one map this machine has measured landing
+ * above a fullscreen game is a fresh CONSTRUCTION map — the boot path the owner's own restart
+ * ritual walks, and the only thing 0.2.8's Electron re-show (and 0.2.13's unmap+remap, same
+ * toolkit path) was measured never doing. So a PIN of an open panel ends by destroying the
+ * window and re-opening it through the same doors the Overlay menu uses: a genuine fresh
+ * construction, born pinned (createOverlayWindow above), at the persisted bounds, over the
+ * game immediately — with no app restart. UNLOCK does not recreate: an unpinned panel is being
+ * positioned on the desktop, where the game cannot occlude it.
+ *
+ * No-op for a closed kind (its next open is born pinned), for the strips (0.2.12's exemption —
+ * and a recreate would drop a live card queue), and in E2E (no window is ever shown there).
+ * The old window's 'closed' handler is identity-guarded (see below in this file), so a late
+ * fire cannot null or unpersist its successor.
+ */
+export function remapOverlayPinned(kind: OverlayKind, locked: boolean): void {
+  const w = overlayWindows[kind]
+  if (!locked || !w || w.isDestroyed()) return
+  if (E2E || isStripKind(kind)) return
+  w.destroy()
+  setOverlayOpen(kind, true)
+}
+
+/**
+ * 0.2.1 diagnostics (overlayDiagnostics.ts): every overlay window's Electron-side
+ * facts, one per window that exists. The X half of the same snapshot is read by the
+ * diagnostics module; this is the half only this process can state.
+ */
+export function overlayWindowFacts(): readonly {
+  kind: OverlayKind
+  id: number
+  visible: boolean
+  alwaysOnTop: boolean
+  bounds: Electron.Rectangle
+}[] {
+  const out: { kind: OverlayKind; id: number; visible: boolean; alwaysOnTop: boolean; bounds: Electron.Rectangle }[] = []
+  for (const kind of OVERLAY_KINDS) {
+    const w = overlayWindows[kind]
+    if (!w || w.isDestroyed()) continue
+    out.push({
+      kind,
+      id: w.id,
+      visible: w.isVisible(),
+      alwaysOnTop: w.isAlwaysOnTop(),
+      bounds: w.getBounds()
+    })
+  }
+  return out
 }
 
 /**

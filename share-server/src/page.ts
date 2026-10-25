@@ -400,7 +400,7 @@ function hotspotCss(input: PageInput): string {
 /** The copy block. The string is base64url by construction; it is escaped anyway, on principle. */
 function shareStringBlock(shareString: string): string {
   return (
-    `<section class="panel"><h2>Open this in EQ Zera</h2>` +
+    `<section class="panel"><h2>Open this in Brujoloco EQL</h2>` +
     `<p class="muted">Paste this into the Character tab's <em>View a shared profile</em> box.</p>` +
     `<textarea id="eqc" class="eqc" readonly rows="3" spellcheck="false">${esc(shareString)}</textarea>` +
     `<p class="row"><button id="copy" type="button" class="btn">Copy share string</button>` +
@@ -486,7 +486,7 @@ function metaTags(input: PageInput, title: string, description: string): string 
   const tags = [
     `<meta name="description" content="${esc(description)}">`,
     `<meta property="og:type" content="website">`,
-    `<meta property="og:site_name" content="EQ Zera">`,
+    `<meta property="og:site_name" content="Brujoloco EQL">`,
     `<meta property="og:title" content="${esc(title)}">`,
     `<meta property="og:description" content="${esc(description)}">`,
     `<meta property="og:url" content="${esc(pageUrl)}">`,
@@ -507,7 +507,7 @@ const SITE = 'https://eqzera.com/'
  */
 function brandBar(): string {
   return (
-    `<nav class="brand"><a class="home" href="${SITE}"><img src="/logo.png" alt="" width="32" height="32">EQ Zera</a>` +
+    `<nav class="brand"><a class="home" href="${SITE}"><img src="/logo.png" alt="" width="32" height="32">Brujoloco EQL</a>` +
     `<a class="get" href="${SITE}#install">Get the app</a></nav>`
   )
 }
@@ -521,7 +521,7 @@ function header(input: PageInput): string {
   return (
     `<header><h1>${esc(profile.name ?? 'A character')}</h1>` +
     (sub.length ? `<p class="sub">${esc(sub.join(' · '))}</p>` : '') +
-    `<p class="meta">Shared from EQ Zera · ${esc(isoDate(input.updatedAt))}</p></header>`
+    `<p class="meta">Shared from Brujoloco EQL · ${esc(isoDate(input.updatedAt))}</p></header>`
   )
 }
 
@@ -533,7 +533,7 @@ export function renderPage(input: PageInput): string {
   return (
     `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
     `<meta name="viewport" content="width=device-width,initial-scale=1">` +
-    `<title>${esc(title)} · EQ Zera</title>` +
+    `<title>${esc(title)} · Brujoloco EQL</title>` +
     metaTags(input, title, description) +
     `<style nonce="${esc(input.nonce)}">${STYLE}${scoreWidthCss(input.profile)}${hotspotCss(input)}</style>` +
     `</head><body><div class="wrap">` +
@@ -545,7 +545,7 @@ export function renderPage(input: PageInput): string {
     slotsBlock(input.profile) +
     historyPanel(input.profile, snapshotOf(input.profile, input.updatedAt), input.history ?? []) +
     shareStringBlock(input.shareString) +
-    `<footer><a href="https://eqzera.com/">EQ Zera</a> reads your EverQuest Legends log live. ` +
+    `<footer><a href="https://eqzera.com/">Brujoloco EQL</a> reads your EverQuest Legends log live. ` +
     `<a href="https://eqzera.com/#install">Install it</a> to build a profile of your own.</footer>` +
     `</div>` +
     copyScript(input.nonce) +

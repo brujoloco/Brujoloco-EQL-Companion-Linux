@@ -127,7 +127,10 @@ export interface OverlayChrome {
   /** `capture('window', …)` — the whole-window sensor, spelled as the two DOM handler names. */
   onEnter: () => void
   onLeave: () => void
-  /** spread onto the header: the whole bar drags the window when interactive */
+  /** spread onto the header: the whole bar drags the window when interactive — and
+ *  (Linux Edition) while a LOCKED panel's hover door is open, so a pinned panel can be
+ *  arranged with the mouse without unpinning it first. The door is the same sensor
+ *  that reveals the unlock pin: pointer over the panel, door open, drag by the bar. */
   dragRegion: React.CSSProperties
   /** spread onto anything clickable inside a drag region */
   noDrag: React.CSSProperties
@@ -325,7 +328,7 @@ export function useOverlayChrome(): OverlayChrome {
     capture,
     onEnter: () => capture('window', true),
     onLeave: () => capture('window', false),
-    dragRegion: !locked ? ({ WebkitAppRegion: 'drag' } as React.CSSProperties) : {},
+    dragRegion: !locked || hovering ? ({ WebkitAppRegion: 'drag' } as React.CSSProperties) : {},
     noDrag: { WebkitAppRegion: 'no-drag' } as React.CSSProperties
   }
 }

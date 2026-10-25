@@ -82,7 +82,7 @@ function head(){
 var s=data.status;
 var who=el('who'),sub=el('sub');
 if(!who||!sub)return;
-who.textContent=s&&s.name?s.name:'EQ Zera';
+who.textContent=s&&s.name?s.name:'Brujoloco EQL';
 var bits=[];
 if(s&&s.level)bits.push('Lv '+s.level);
 if(s&&s.classes&&s.classes.length)bits.push(s.classes.join('/'));

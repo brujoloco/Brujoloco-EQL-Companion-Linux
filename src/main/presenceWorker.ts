@@ -238,6 +238,27 @@ function run(native: PresenceNative): void {
     say(`C|${String(cur)}`)
   }
 
+  /**
+   * 0.2.19 — THE RING'S POSITION, riding the one cursor read the tick already made. CHANGE-DRIVEN
+   * like every other block on this wire: a still mouse costs nothing, a moving one is one short
+   * line per changed position, and the NaN a failed read leaves (both surfaces' failure rule)
+   * is silence rather than a teleport to nowhere — the same "a cursor nobody can read is not a
+   * cursor that moved" value `pointerWatch.ts` states. WHY THIS EXISTS AT ALL: Electron's
+   * `getCursorScreenPoint` is a live query on Windows and the LAST EVENT THIS APP SAW on X11
+   * (measured, 2026-10-25) — and the ring's window is click-through, so while the game owns the
+   * screen the app receives no pointer events and the halo froze where focus changed hands.
+   * The tick's `cursorShowing` read IS live on both platforms, so the point goes out with it.
+   */
+  let lastPtX = Number.NaN
+  let lastPtY = Number.NaN
+  function pointBlock(pt: MutablePoint): void {
+    if (!Number.isFinite(pt.x) || !Number.isFinite(pt.y)) return
+    if (pt.x === lastPtX && pt.y === lastPtY) return
+    lastPtX = pt.x
+    lastPtY = pt.y
+    say(`P|${String(Math.round(pt.x))}|${String(Math.round(pt.y))}`)
+  }
+
   function tick(): void {
     try {
       // ONE cursor read per tick, whoever wants it. The hit test rides the ring's `GetCursorInfo`
@@ -245,6 +266,7 @@ function run(native: PresenceNative): void {
       const hoverOn = hoverEveryTicks > 0 && hover.active()
       const showing = watchCursor || hoverOn ? native.cursorShowing(hover.point) : true
       if (watchCursor) cursorBlock(showing)
+      if (watchCursor) pointBlock(hover.point)
       if (hoverOn) {
         hoverCountdown -= 1
         if (hoverCountdown <= 0) {

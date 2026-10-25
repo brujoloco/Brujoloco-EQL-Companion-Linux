@@ -29,7 +29,7 @@ import {
 } from '../src/main/feedback/mail'
 import { FEEDBACK_MAIL_TO, MAILTO_BODY_BUDGET, TRUNCATION_NOTE } from '../src/shared/feedbackReport'
 
-const SUBJECT = 'EQ Zera bug report - v1.7.0'
+const SUBJECT = 'Brujoloco EQL bug report - v1.7.0'
 
 test('the recipient is COMPILED IN and is the first thing in the URL', () => {
   assert.equal(MAILTO_PREFIX, `mailto:${FEEDBACK_MAIL_TO}?`)

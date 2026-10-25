@@ -276,10 +276,10 @@ test('the introduction card NAMES THE APP and points at the way out', () => {
   assert.equal(p.kind, 'intro')
   // The report is "I could not tell what this window was", so the app's name in the title is the
   // literal fix — not a decoration to be reworded away.
-  assert.match(p.title, /EQ Zera/)
+  assert.match(p.title, /Brujoloco/)
   assert.match(p.subtitle ?? '', /appear here/)
   // …and the body says whose window it is, and both exits: the × on the card, and Preferences.
-  assert.match(TOAST_INTRO_BODY, /EQ Zera/)
+  assert.match(TOAST_INTRO_BODY, /Brujoloco/)
   assert.match(TOAST_INTRO_BODY, /not to EverQuest/)
   assert.match(TOAST_INTRO_BODY, /Preferences/)
 })
@@ -457,13 +457,13 @@ test('…and the card itself offers no action label, because it names no destina
 //   * `action` is not a field the validator copies, so it cannot ride in on an accepted kind.
 
 test('the `update` kind is REFUSED from a renderer request — main builds that card, nobody asks for it', () => {
-  assert.equal(validateToastRequest({ id: 'update:9.9.9', kind: 'update', title: 'EQ Zera 9.9.9 is ready' }), null)
+  assert.equal(validateToastRequest({ id: 'update:9.9.9', kind: 'update', title: 'Brujoloco EQL 9.9.9 is ready' }), null)
   // …including with the action that would arm it, and including a plausible-looking full payload.
   assert.equal(
     validateToastRequest({
       id: 'update:9.9.9',
       kind: 'update',
-      title: 'EQ Zera 9.9.9 is ready',
+      title: 'Brujoloco EQL 9.9.9 is ready',
       subtitle: 'Click to download and install',
       action: 'updateInstall',
       durationMs: 30_000

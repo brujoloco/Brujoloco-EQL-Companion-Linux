@@ -173,15 +173,17 @@ test('a HANDLED condition is counted but never enters the rate — that number i
 test('release dates come from the COMMITTED notes, and an unreleased build gets null not a guess', () => {
   const d = buildWith({
     usage: [
-      u(TODAY, USAGE_METRICS.version, '0.9.0', 3),
+      // A version the consolidated changelog carries (0.2.23; the intermediate 0.2.x
+      // numbers were folded into it, 2026-10-25).
+      u(TODAY, USAGE_METRICS.version, '0.2.23', 3),
       // A build with no entry in RELEASE_NOTES — a dev build, or one newer than this copy.
       u(TODAY, USAGE_METRICS.version, '99.0.0', 1)
     ]
   }).releaseHealth
   // Pinned against the real committed table, so a note that loses its date fails here.
   assert.equal(
-    d.versions.find((v) => v.version === '0.9.0')?.releaseDate,
-    RELEASE_NOTES.find((n) => n.version === '0.9.0')?.date
+    d.versions.find((v) => v.version === '0.2.23')?.releaseDate,
+    RELEASE_NOTES.find((n) => n.version === '0.2.23')?.date
   )
   assert.equal(d.versions.find((v) => v.version === '99.0.0')?.releaseDate, null)
 })

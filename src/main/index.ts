@@ -24,6 +24,7 @@
 // FIRST import on purpose: channel.ts picks this process's `userData` dir (prod / dev /
 // e2e — Task #58) and runs the one-time state seed, before electron-store is constructed
 // (module-level) further down this import list.
+import { join } from 'node:path'
 import { CHANNEL, USER_DATA } from './channel'
 // SECOND on purpose: installs the uncaughtException/unhandledRejection sinks before any
 // module body below can throw. See crashGuards.ts.
@@ -77,9 +78,12 @@ import {
   hardenSession,
   hardenWebContents,
   reconcileOverlayDisplays,
-  sendToMain
+  sendToMain,
+  overlayWindowFacts
 } from './windows'
 import { watchDisplays } from './windowPlacement'
+import { startOverlayDiagnostics, stopOverlayDiagnostics } from './overlayDiagnostics'
+import { startOverlayHoverPoll, stopOverlayHoverPoll } from './overlayHover'
 import { OVERLAY_KINDS } from '../shared/types'
 
 // --- custom schemes: the permanent image cache (eqimg://) and the speech cache (eqspeech://) ---
@@ -373,6 +377,21 @@ if (!gotSingleInstanceLock) {
     // mid-session the loop starts then, not next launch. Same predicate discipline as
     // `queueFlushEnabled` — one gate, in one place.
     startTelemetry(Date.now() - PROCESS_START_MS)
+    // 0.2.1 — THE OVERLAY DIAGNOSTICS TRACE (overlayDiagnostics.ts). Linux only, never under
+    // E2E: records the full X stacking plus each overlay's visibility ON EVERY CHANGE to
+    // <userData>/overlay-diagnostics.log — the story of the alt-tab, not a transcript.
+    startOverlayDiagnostics({
+      enabled: process.platform === 'linux' && !E2E,
+      logPath: join(USER_DATA, 'overlay-diagnostics.log'),
+      facts: overlayWindowFacts
+    })
+    // 0.2.5 — THE LINUX HOVER POLL (overlayHover.ts's own sensor section). The worker
+    // that senses a locked panel's hover on Windows cannot load on Linux, so a pinned panel
+    // has been unpinnable here since the port — the unlock pin waits on an edge nothing
+    // sent. The poll watches each LOCKED panel's whole window (0.2.2's lesson: the 40 px
+    // chrome strip flapped under pointer jitter; the window cannot) and feeds the same
+    // transition the worker did. Windows keeps the worker; E2E shows no window to sense.
+    startOverlayHoverPoll({ enabled: process.platform === 'linux' && !E2E })
     // Self-provision the shipped voice packs (Task #39): a CI-built installer ships
     // WITHOUT the gitignored peon/sc_marine packs, so a fresh install's seeded
     // charm-break alert would reference a missing sound. Download any missing default
@@ -454,6 +473,8 @@ if (!gotSingleInstanceLock) {
  */
 app.on('before-quit', () => {
   teardownStep('main:stopPresence', stopPresenceEffects)
+  teardownStep('main:stopOverlayDiagnostics', stopOverlayDiagnostics)
+  teardownStep('main:stopOverlayHoverPoll', stopOverlayHoverPoll)
   // …and the away-alerts drain tick. Unref'd, so it could never hold the process open by itself;
   // stopped here anyway for the reason every other timer in this teardown is - a tick that fires
   // mid-quit would reach a store this process is about to flush.
@@ -553,6 +574,8 @@ app.on('window-all-closed', () => {
   // Stop the presence watcher thread + the cursor stream. Both already unref, but an unref'd
   // worker is still a running thread: nothing else would end it.
   teardownStep('main:stopPresence', stopPresenceEffects)
+  teardownStep('main:stopOverlayDiagnostics', stopOverlayDiagnostics)
+  teardownStep('main:stopOverlayHoverPoll', stopOverlayHoverPoll)
   // Stop the engine child (JOS-467). Idempotent with the `before-quit` step above — one `end()` on
   // an already-closed pipe — and here for the same belt-and-braces reason every other teardown is
   // on both events.

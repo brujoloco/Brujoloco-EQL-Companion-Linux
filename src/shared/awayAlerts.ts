@@ -176,10 +176,10 @@ export interface AwayItem {
 export const AWAY_EMBED_COLOR = 0xffc857
 
 /** What the message is called. */
-const AWAY_TITLE = 'EQ Zera · while you were away'
+const AWAY_TITLE = 'Brujoloco EQL · while you were away'
 
 /** The same footer every embed this app posts carries. */
-const AWAY_FOOTER = 'EQ Zera · eqzera.com'
+const AWAY_FOOTER = 'Brujoloco EQL'
 
 /** How many firings one message spells out before it starts counting instead. */
 export const AWAY_MAX_LINES = 10

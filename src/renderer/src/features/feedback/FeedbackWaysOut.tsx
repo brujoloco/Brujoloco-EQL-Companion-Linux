@@ -64,10 +64,10 @@ function buildReport(
   })
 }
 
-/** `EQ Zera bug report - v1.7.0`. The version is in the subject because it is the first thing
+/** `Brujoloco EQL bug report - v1.7.0`. The version is in the subject because it is the first thing
  *  the reader needs and the last thing a person remembers to include. */
 function mailSubject(state: FeedbackState, ctx: FeedbackContext): string {
-  return `EQ Zera ${state.fields.type} report - v${ctx.env.appVersion}`
+  return `Brujoloco EQL ${state.fields.type} report - v${ctx.env.appVersion}`
 }
 
 /** The copy button's transient state: a label that says "Copied" for a moment, the CopyButton

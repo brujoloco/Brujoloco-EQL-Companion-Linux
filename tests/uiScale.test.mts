@@ -246,9 +246,11 @@ test('the section is called Appearance, and its id is NOT renamed with it', () =
   assert.match(card, /id: 'textsize'/, 'the section id must not move')
   assert.match(card, /label: 'Appearance'/)
   assert.match(card, /label: 'In-app text size'/, 'the first item is about the app window only')
-  // …and the overlays are ONE item, not three.
+  // …and the overlays are ONE item, not three. (The fork's Theme picker, from 0.1.0, is the
+  // third — so the count is exactly the three surfaces the pane offers.)
   const items = card.match(/^ {6}\{$/gm) ?? []
-  assert.equal(items.length, 2, 'the section carries exactly two items')
+  assert.equal(items.length, 3, 'the section carries exactly three items')
+  assert.match(card, /<ThemeSetting \/>/)
   assert.match(card, /<OverlaysAppearanceSetting \/>/)
   const view = src('../src/renderer/src/features/preferences/PreferencesView.tsx')
   assert.match(view, /appearanceSection\(\)/, 'and the pane builds it under that name')

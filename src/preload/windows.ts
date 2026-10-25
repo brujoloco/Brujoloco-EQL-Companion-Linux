@@ -66,6 +66,12 @@ export const windowsApi = {
     ipcRenderer.on(IPC.onOverlayState, listener)
     return () => ipcRenderer.removeListener(IPC.onOverlayState, listener)
   },
+  /** "Unlock all overlay windows" (0.2.11): drop click-through on every PANEL kind at once, so
+   *  each panel becomes interactive and repositionable on the desktop. (0.2.12: the strips stay
+   *  exempt — a pop-up must stay composited over the game.) One send — main owns the kind
+   *  list and reuses the per-panel lock door — so this is the bulk form of the pin, not a second
+   *  writer. Fire-and-forget; open overlays re-apply immediately, closed ones persist `locked:false`. */
+  unlockAllOverlays: (): void => ipcRenderer.send(IPC.overlayUnlockAll),
 
   // ---- global fight selection (docs/plans/combat-overlay-parity.md P4) ----
   // It lives in THIS slice rather than beside the combat snapshot because it is a CROSS-WINDOW

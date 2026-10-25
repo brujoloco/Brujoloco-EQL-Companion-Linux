@@ -53,7 +53,7 @@ const DRAFT: FeedbackDraft = {
 
 test('formatReport states the kind, the words, and the build', () => {
   const text = formatReport({ draft: DRAFT, env: ENV })
-  assert.match(text, /^EQ Zera bug report\n/)
+  assert.match(text, /^Brujoloco EQL bug report\n/)
   assert.ok(text.includes(DRAFT.description))
   assert.ok(text.includes('About this install'))
   assert.ok(text.includes('version: 1.7.0'))
@@ -68,7 +68,7 @@ test('a feature request is titled as one', () => {
     draft: { type: 'feature', description: 'A per-character bank search would save me an hour.' },
     env: ENV
   })
-  assert.match(text, /^EQ Zera feature report\n/)
+  assert.match(text, /^Brujoloco EQL feature report\n/)
 })
 
 test('the app name is a parameter, not a hardcoded word', () => {
@@ -190,7 +190,7 @@ function hugeReport(): string {
 test('an issue URL points at THIS fork and fits the budget for a 4,000-character report', () => {
   const body = hugeReport()
   assert.ok(body.length > 4_000, `${String(body.length)} chars of report`)
-  const url = githubIssueUrl('EQ Zera bug report - v1.7.0', body)
+  const url = githubIssueUrl('Brujoloco EQL bug report - v1.7.0', body)
   assert.ok(url !== null)
   assert.ok(url.startsWith(`${FEEDBACK_ISSUES_URL}?title=`))
   assert.ok(url.length <= ISSUE_URL_BUDGET, `${String(url.length)} chars`)
@@ -200,7 +200,7 @@ test('an issue URL points at THIS fork and fits the budget for a 4,000-character
 
 test('a short report is carried WHOLE, not cut to a fixed size', () => {
   const body = formatReport({ draft: DRAFT, env: ENV })
-  const url = githubIssueUrl('EQ Zera bug report - v1.7.0', body)
+  const url = githubIssueUrl('Brujoloco EQL bug report - v1.7.0', body)
   assert.ok(url !== null)
   assert.ok(url.includes(encodeURIComponent(DRAFT.description)))
   assert.ok(!url.includes(encodeURIComponent(TRUNCATION_NOTE)))
@@ -208,7 +208,7 @@ test('a short report is carried WHOLE, not cut to a fixed size', () => {
 
 test('a body that has to be cut still produces a URL under the ceiling, marked as cut', () => {
   const body = hugeReport()
-  const url = githubIssueUrl('EQ Zera bug report - v1.7.0', body)
+  const url = githubIssueUrl('Brujoloco EQL bug report - v1.7.0', body)
   assert.ok(url !== null)
   assert.ok(url.length <= ISSUE_URL_BUDGET)
   assert.ok(url.includes(encodeURIComponent(TRUNCATION_NOTE)))
@@ -216,7 +216,7 @@ test('a body that has to be cut still produces a URL under the ceiling, marked a
 
 test('it is never null for a sane title, however hostile the body', () => {
   const nasty = ' \n\t& ? # % = + '.repeat(400)
-  const url = githubIssueUrl('EQ Zera bug report - v1.7.0', nasty)
+  const url = githubIssueUrl('Brujoloco EQL bug report - v1.7.0', nasty)
   assert.ok(url !== null)
   assert.ok(url.length <= ISSUE_URL_BUDGET)
 })

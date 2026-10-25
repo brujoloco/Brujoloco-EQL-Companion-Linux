@@ -136,13 +136,46 @@ export interface ReleaseNote {
  */
 export const RELEASE_NOTES: readonly ReleaseNote[] = [
   // ───────────────────────────────────────────────────────────────────────────
+  // Brujoloco EQL Companion — Linux Edition (0.2.23)
+  // ───────────────────────────────────────────────────────────────────────────
+  //
+  // THE 0.2 SERIES, CONSOLIDATED (the owner's ask, 2026-10-25): the granular
+  // entries from 0.2.0 through 0.2.21 are gone - one working session, twenty-one
+  // half-steps, four things worth saying, said here in the owner's other ask:
+  // the tired-human voice of whoever actually did the seven hours, and the
+  // mage emoji sprinkled where it belongs. Numbered 0.2.23 because the panel
+  // flags whatever is newer than the last version an install saw, and a
+  // rewording is still a change.
+  {
+    version: '0.2.23',
+    date: '2026-10-25',
+    entries: [
+      {
+        kind: 'fixed',
+        text: '🧙 The overlays finally sit over the game. A panel opened while EverQuest owns the screen lands above it and stays there, a pinned panel reveals its header so you can drag it anywhere, and it remembers the spot you left it. Pin it and it shows in game; unpin it to shuffle it around the desktop.'
+      },
+      {
+        kind: 'new',
+        text: '"Unlock all overlay windows" joins the overlay menu. One click drops click-through on every panel so you can rearrange the whole fleet at once, then re-pin the keepers. The con card, the celebration toasts and the alert banner stay pinned over the game - they earn their keep.'
+      },
+      {
+        kind: 'fixed',
+        text: 'The cursor ring works on Linux now, I promise 🧙. Its watcher used to demand Windows bindings this machine cannot even open, so the ring never existed here; it reads the window system directly now and the halo follows your pointer over EverQuest. That one took three attempts and every one was worth it.'
+      },
+      {
+        kind: 'changed',
+        text: 'Both app icons are a mage 🧙. The taskbar window mark and the tray icon render the wizard emoji, replacing the drawn badge they carried. Twenty-odd builds later, the app finally looks like itself.'
+      }
+    ]
+  },
+  // ───────────────────────────────────────────────────────────────────────────
   // Brujoloco EQL Companion — Linux Edition (0.1.0)
   // ───────────────────────────────────────────────────────────────────────────
   //
   // This is the first release of the Brujoloco EQL Companion, a full rework of the
   // EQ Zera build (1.26.1) into a native Linux AppImage. The upstream EQ Zera changelog
-  // that preceded this entry has been removed; this entry is the whole of the Brujoloco
-  // release notes. See the 'About this build' section in Preferences for the build's
+  // that preceded this entry has been removed; the Brujoloco release notes begin
+  // here. See the 'About this build' section in Preferences for the build's
   // origin story and license.
   {
     version: '0.1.0',
@@ -150,7 +183,7 @@ export const RELEASE_NOTES: readonly ReleaseNote[] = [
     entries: [
       {
         kind: 'new',
-        text: 'Brujoloco EQL Companion, Linux Edition — a full rework of the EQ Zera 1.26.1 build into a native Linux AppImage. The Rust log engine (zengine) is compiled natively for linux-x64 and bundled inside the AppImage; the Electron renderer and main bundles build clean on Linux with no source changes. Point the app at your EverQuest install under a Wine prefix via Settings and it reads the same log it has always read.'
+        text: 'Brujoloco EQL Companion, Linux Edition - a full rework of the EQ Zera 1.26.1 build into a native Linux AppImage. The Rust log engine (zengine) is compiled natively for linux-x64 and bundled inside the AppImage; the Electron renderer and main bundles build clean on Linux with no source changes. Point the app at your EverQuest install under a Wine prefix via Settings and it reads the same log it has always read.'
       },
       {
         kind: 'new',
@@ -162,11 +195,11 @@ export const RELEASE_NOTES: readonly ReleaseNote[] = [
       },
       {
         kind: 'fixed',
-        text: 'Adaptive light/dark mode: the MUI theme was hardcoded to dark mode, so the six light themes (Paper White, the three Windows 95 greys, Vintage Cream, Solarized Light) rendered invisible light-on-light text in every submenu. The mode is now derived from each palette — text lighter than paper is dark, text darker than paper is light — so the Preferences rail, dropdowns and cards all flip to readable dark text on light themes.'
+        text: 'Adaptive light/dark mode: the MUI theme was hardcoded to dark mode, so the six light themes (Paper White, the three Windows 95 greys, Vintage Cream, Solarized Light) rendered invisible light-on-light text in every submenu. The mode is now derived from each palette - text lighter than paper is dark, text darker than paper is light - so the Preferences rail, dropdowns and cards all flip to readable dark text on light themes.'
       },
       {
         kind: 'fixed',
-        text: 'The page body background, the 28px grid, ::selection and the scrollbar thumb were module-scope constants that captured the default dark palette at import time and never rebuilt, so the window background stayed the original dark navy on every theme. They are now functions of the live palette, so a theme swap recolours the whole page — the root cause of the "the background is always the original dark blue background" report.'
+        text: 'The page body background, the 28px grid, ::selection and the scrollbar thumb were module-scope constants that captured the default dark palette at import time and never rebuilt, so the window background stayed the original dark navy on every theme. They are now functions of the live palette, so a theme swap recolours the whole page - the root cause of the "the background is always the original dark blue background" report.'
       },
       {
         kind: 'fixed',
@@ -174,7 +207,7 @@ export const RELEASE_NOTES: readonly ReleaseNote[] = [
       },
       {
         kind: 'fixed',
-        text: 'Every cataloged theme is verified to clear WCAG AA (≥4.5:1) for body text on background and paper, and for the accent on paper — enforced by a new themes.test.mts suite that fails the build if a theme ships unreadable. Single-hue themes allow the accent to repeat a series colour; the four non-accent series tokens (cyan/green/amber/red) stay pairwise distinct so charts never draw two lanes in one colour.'
+        text: 'Every cataloged theme is verified to clear WCAG AA (≥4.5:1) for body text on background and paper, and for the accent on paper - enforced by a new themes.test.mts suite that fails the build if a theme ships unreadable. Single-hue themes allow the accent to repeat a series colour; the four non-accent series tokens (cyan/green/amber/red) stay pairwise distinct so charts never draw two lanes in one colour.'
       },
       {
         kind: 'changed',
@@ -186,16 +219,15 @@ export const RELEASE_NOTES: readonly ReleaseNote[] = [
       },
       {
         kind: 'new',
-        text: 'The floating overlays now follow the main theme. Every overlay window (zone meter, fight meter, fight healing, zone healing, event log, buffs, debuffs, xp, respawn, farm meter, run tracker, mob card on /con) is its own renderer process, so it kept the default bluish palette no matter which theme the main window was in. The theme now rides onto them: the overlay preload exposes themeGet + onTheme, the main process broadcasts the theme id to every open overlay on a change and seeds a late-opened one on mount, and the overlay root is wrapped in the app’s MUI ThemeProvider so a live swap recolours it. The overlay components’ module-scope colour captures were converted to live PALETTE reads, and the opaque overlays’ native background is read live too — so a theme change recolours every overlay, with no restart.'
+        text: 'The floating overlays now follow the main theme. Every overlay window (zone meter, fight meter, fight healing, zone healing, event log, buffs, debuffs, xp, respawn, farm meter, run tracker, mob card on /con) is its own renderer process, so it kept the default bluish palette no matter which theme the main window was in. The theme now rides onto them: the overlay preload exposes themeGet + onTheme, the main process broadcasts the theme id to every open overlay on a change and seeds a late-opened one on mount, and the overlay root is wrapped in the app’s MUI ThemeProvider so a live swap recolours it. The overlay components’ module-scope colour captures were converted to live PALETTE reads, and the opaque overlays’ native background is read live too - so a theme change recolours every overlay, with no restart.'
       },
       {
         kind: 'new',
-        text: 'Preferences → About this build: a new section directly above Thanks, naming the build and its origin, declaring it final for Linux, and disclosing the open license — upstream code under FSL-1.1-MIT, the Brujoloco Linux Edition additions under MIT.'
+        text: 'Preferences → About this build: a new section directly above Thanks, naming the build and its origin, declaring it final for Linux, and disclosing the open license - upstream code under FSL-1.1-MIT, the Brujoloco Linux Edition additions under MIT.'
       }
     ]
   }
 ]
-
 interface ParsedVersion {
   readonly major: number
   readonly minor: number

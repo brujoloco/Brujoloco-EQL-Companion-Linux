@@ -177,7 +177,28 @@ test('NO SHIPPED CODE CAN NAME POWERSHELL — the watcher launches nothing at al
  *     never a path from a config file or the wire.
  *   * IT JOINS THE CODE-SIGNING SET like any other shipped executable (phase 3).
  */
-const SPAWNERS = new Set(['main/triage/store.ts', 'main/dataServer/engineHost.ts'])
+
+/**
+ * THE THIRD EXEMPTION, AND IT IS A DIAGNOSTIC BUILD'S OWN EYES (0.2.1, 2026-10-25).
+ *
+ * `main/overlayDiagnostics.ts` runs `xprop` to read the window manager's stacking order
+ * and every stacked window's name, state and pid — the one half of the overlay story
+ * Electron cannot state, because the burial under investigation is a WM fact about
+ * ANOTHER process's window. Same honesty conditions as the engine host:
+ *   * ONE NAMED BINARY, `xprop`, spelled right here and never from config or the wire.
+ *   * READ-ONLY: xprop answers questions about windows; it starts nothing and writes
+ *     nothing, and the diagnostic output goes to <userData>/overlay-diagnostics.log.
+ *   * LINUX ONLY, and gated off under E2E, in the module's own start gate.
+ */
+const SPAWNERS = new Set([
+  'main/triage/store.ts',
+  'main/dataServer/engineHost.ts',
+  // 0.2.1 (2026-10-25): the overlay diagnostics trace reads the WM through ONE named
+  // read-only binary, `xprop` — no shell, no config-sourced path, Linux-only, off under
+  // E2E — because the stacking facts it records are about ANOTHER process's windows,
+  // the one thing Electron cannot state for itself.
+  'main/overlayDiagnostics.ts'
+])
 
 /** Every module specifier a file imports or re-exports. */
 function importSpecifiers(file: string): string[] {
@@ -197,7 +218,7 @@ function importSpecifiers(file: string): string[] {
   return out
 }
 
-test('NOTHING UNDER src/ CAN START A PROCESS — two exemptions, each argued above', () => {
+test('NOTHING UNDER src/ CAN START A PROCESS — three exemptions, each argued above', () => {
   const files = sourceFiles(SRC_ROOT)
   const offenders: string[] = []
   let exempted = 0

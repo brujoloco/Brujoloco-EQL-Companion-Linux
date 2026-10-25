@@ -128,8 +128,8 @@ const ERR = {
   /** The service is up but has no Discord app configured. Nothing the reader can do about it. */
   off: 'The share service is not set up for Discord yet.',
   /** 400: the state this app minted was not one the service would look at. That is OUR defect. */
-  internal: 'EQ Zera could not connect that channel. Try again.',
-  offline: 'Could not reach the EQ Zera service.',
+  internal: 'Brujoloco EQL could not connect that channel. Try again.',
+  offline: 'Could not reach the Brujoloco EQL service.',
   timeout: 'Nothing came back from Discord. Press Connect a Discord channel again.',
   browser: 'Your browser could not be opened.'
 } as const

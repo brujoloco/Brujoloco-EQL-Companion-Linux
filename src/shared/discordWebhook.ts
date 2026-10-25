@@ -191,7 +191,7 @@ const EMBED_COLOR = 0x5ee6ff
  * (share-server/src/logo.ts serves `/logo.png`). The two URLs this app actually builds - the link
  * and the card - are still minted from `SHARE_ORIGIN` by the caller and are never spelled here.
  */
-const POST_USERNAME = 'EQ Zera'
+const POST_USERNAME = 'Brujoloco EQL'
 const POST_AVATAR = 'https://share.eqzera.com/logo.png'
 
 /**
@@ -317,7 +317,7 @@ export function discordEmbedFor(
     color: EMBED_COLOR,
     image: { url: cardUrl },
     fields: scoreFields(profile),
-    footer: { text: cut('EQ Zera · eqzera.com', LIMIT.footer) },
+    footer: { text: cut('Brujoloco EQL', LIMIT.footer) },
     timestamp: embedTimestamp(profile.capturedAt)
   }
   return discordPostBody(embed)
@@ -339,6 +339,6 @@ export function discordPostBody(embed: DiscordEmbed): DiscordWebhookBody {
 export function discordTestBody(): { username: string; content: string } {
   return {
     username: POST_USERNAME,
-    content: 'EQ Zera connected. Character cards you post will appear here.'
+    content: 'Brujoloco EQL connected. Character cards you post will appear here.'
   }
 }

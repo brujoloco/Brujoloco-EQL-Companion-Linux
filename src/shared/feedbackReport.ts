@@ -124,7 +124,7 @@ function attachmentsBlock(input: ReportInput): string {
  * and fetch. Absent parts render away entirely rather than as empty headings.
  */
 export function formatReport(input: ReportInput): string {
-  const app = input.appName ?? 'EQ Zera'
+  const app = input.appName ?? 'Brujoloco EQL'
   const kind = input.draft.type === 'bug' ? 'bug' : 'feature'
   const blocks = [
     `${app} ${kind} report`,

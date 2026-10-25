@@ -15,6 +15,7 @@
 // `src/main/presenceNative.ts` is the Win32 surface that loop reads.
 
 import type {
+  CursorPoint,
   CursorRingPrefs,
   OverlayAutoHidePrefs,
   PresenceState,
@@ -79,6 +80,7 @@ export type PresenceRecord =
   | { t: 'fg'; pid: number; rect: ScreenRect; exePath: string; title: string }
   | { t: 'run'; running: boolean }
   | { t: 'cursor'; visible: boolean }
+  | { t: 'point'; point: CursorPoint }
   | { t: 'hover'; key: string; inside: boolean }
   | { t: 'beat' }
   | { t: 'exit'; reason: string }
@@ -163,6 +165,20 @@ export function parsePresenceLine(line: string): PresenceRecord | null {
   if (parts[0] === 'F') return parseForeground(parts)
   if (parts[0] === 'X') return parseExit(parts)
   if (parts[0] === 'V') return parseHover(parts)
+  // 0.2.19 — THE RING'S LIVE POINT: `P|x|y`, physical pixels like every other coordinate on
+  // this wire (the note above the hot zones states the law), sent on change only, and the
+  // answer to a measured platform fact: Electron's `getCursorScreenPoint` on X11 is the last
+  // pointer event THIS APP saw rather than where the pointer is (2026-10-25 probe: a warped
+  // pointer moved the raw X read and left Electron's frozen), and a click-through ring sees
+  // no events while the game owns the screen. The worker's per-tick `cursorShowing` read is
+  // the live query — on Win32 `GetCursorInfo`'s ptScreenPos, on X11 `XQueryPointer` — so the
+  // ring rides that read to main instead of an event cache.
+  if (parts[0] === 'P') {
+    const px = intField(parts[1])
+    const py = intField(parts[2])
+    if (px === null || py === null) return null
+    return { t: 'point', point: { x: px, y: py } }
+  }
   const flag = boolField(parts[1])
   if (flag === null) return null
   if (parts[0] === 'R') return { t: 'run', running: flag }

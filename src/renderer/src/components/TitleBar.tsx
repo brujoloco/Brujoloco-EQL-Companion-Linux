@@ -269,6 +269,29 @@ function OverlayMenu({ overlayState }: { overlayState: Record<OverlayKind, boole
             secondary="Overlays stay up; the tray icon brings the window back"
           />
         </MenuItem>
+        <Divider />
+        {/* UNLOCK ALL OVERLAY WINDOWS (0.2.11). The owner's 2026-10-25 finding: a CLICK-THROUGH
+            (pinned) window composites over wine's fullscreen client, an interactive one gets
+            occluded — so the pin is what lands a panel over the game, and an unlock is how you
+            reposition one. This is the bulk form: one click drops click-through on every PANEL
+            at once so the player can rearrange them on the desktop, then re-pin the ones they want
+            back over EQ. (0.2.12) The strips stay out of it — the con card, the celebration toasts
+            and the alert banner are pop-ups that must stay composited over the game, so their
+            locked state is never written by this action. It does NOT open or close anything —
+            only `locked` — and it sits below the tray preference because it is the overlays' other
+            promise: a panel you can always reach. */}
+        <MenuItem
+          dense
+          data-testid="overlay-menu-unlock-all"
+          onClick={() => {
+            window.eq.unlockAllOverlays()
+          }}
+        >
+          <ListItemText
+            primary="Unlock all overlay windows"
+            secondary="Click-through off on every panel - drag to reposition, then re-pin; the con card, celebration and alert windows stay untouched"
+          />
+        </MenuItem>
       </Menu>
     </Box>
   )

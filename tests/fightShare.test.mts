@@ -230,13 +230,13 @@ test('the text summary is a headline and one line per member', () => {
 
 test('the embed titles the fight, tiles your numbers and signs itself', () => {
   const body = discordFightEmbed(FIGHT, true)
-  assert.equal(body.username, 'EQ Zera')
+  assert.equal(body.username, 'Brujoloco EQL')
   assert.equal(body.content, '', 'the embed IS the message')
   const embed = body.embeds[0]
   assert.ok(embed)
   assert.equal(embed.title, 'a dark elf priest · 1:06 · 48,204 damage')
   assert.equal(embed.color, 0xff6b6b)
-  assert.equal(embed.footer.text, 'EQ Zera · eqzera.com')
+  assert.equal(embed.footer.text, 'Brujoloco EQL')
   assert.equal(embed.timestamp, new Date(STARTED_AT).toISOString())
   assert.equal(embed.url, undefined, 'a fight is not a link - Discord refuses an empty one')
   assert.deepEqual(

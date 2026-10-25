@@ -149,7 +149,7 @@ test('the prefilled ISSUE link the feedback dialog builds actually opens', () =>
       node: '20.14.0'
     }
   })
-  const url = githubIssueUrl('EQ Zera bug report - v1.7.0', body)
+  const url = githubIssueUrl('Brujoloco EQL bug report - v1.7.0', body)
   assert.ok(url !== null)
   assert.equal(allowedExternalUrl(url), url)
 })

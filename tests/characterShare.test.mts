@@ -253,7 +253,7 @@ test('the text summary states who, then the scores, then one line per worn slot'
   assert.ok(lines[2].includes('Charisma'), 'and it runs to the last attribute the totals carry')
   assert.match(lines[3], /^AC \d+ from \d+ of 22 worn items$/)
   assert.equal(lines[4], '')
-  assert.equal(lines.at(-1), 'Shared from EQ Zera')
+  assert.equal(lines.at(-1), 'Shared from Brujoloco EQL')
   // One line per WORN slot and not one per place: the empty two say nothing.
   const gear = lines.slice(5, lines.length - 2)
   assert.equal(gear.length, 22)

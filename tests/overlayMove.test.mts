@@ -99,7 +99,7 @@ test('each preview has ONE stable id, so pressing Preview twice refreshes rather
 
 test('the celebration preview IS the introduction card, on a preview clock and its own id', () => {
   // Not a fourth piece of copy: the introduction already says what this window is and that it
-  // belongs to EQ Zera rather than to EverQuest, and a second wording would be a second answer.
+  // belongs to Brujoloco rather than to EverQuest, and a second wording would be a second answer.
   const intro = introToastPayload()
   const preview = previewToastPayload()
   assert.equal(preview.title, intro.title)

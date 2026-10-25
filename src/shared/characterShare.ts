@@ -518,6 +518,6 @@ export function characterShareText(profile: CharacterProfileShare): string {
   lines.push('')
   for (const cell of profile.cells) lines.push(cellLine(cell))
   lines.push('')
-  lines.push('Shared from EQ Zera')
+  lines.push('Shared from Brujoloco EQL')
   return lines.join('\n')
 }

@@ -72,7 +72,7 @@ import {
   type HoverZone
 } from './presenceProtocol'
 import { INITIAL_PRESENCE } from '../shared/presencePrefs'
-import type { PresenceState, ScreenRect } from '../shared/presencePrefs'
+import type { CursorPoint, PresenceState, ScreenRect } from '../shared/presencePrefs'
 // THE ONE QUESTION THIS FILE CANNOT ANSWER FROM A WATCHER LINE (JOS-199): which of OUR windows is
 // in front. Every window this process owns reports the same pid and the same image path, so the
 // accessory/app split has to come from Electron. It is a QUERY — the only thing imported from the
@@ -277,15 +277,24 @@ function applyFocus(observed: boolean): void {
  * screen instead of tracking it, at an offset, across the second one.
  */
 /**
- * The physical-pixel → DIP conversion, bound to Electron (JOS-376). Windows-only by construction:
- * `screenToDipRect` exists on Windows, and so does the watcher — nothing else ever reaches this
- * line, so it needs no platform branch of its own beyond the one that gates presence.
+ * The physical-pixel → DIP conversion, bound to Electron (JOS-376). `screenToDipRect` is a
+ * WINDOWS/macOS API — Electron 43 ships no such call on Linux (measured in the packaged app,
+ * 2026-10-25: "electron.screen.screenToDipRect is not a function", main:uncaughtException,
+ * the first time presence computed EQ bounds there) — so the call is guarded with the same
+ * identity fallback `overlayHover.toPhysical` established: on an unscaled X11 desktop DIP and
+ * physical pixels are the same rectangle, which is exactly what `presenceNativeX11` reads.
  *
  * No "is `screen` ready" guard, deliberately: the watcher is started from `refreshPresenceEffects`
  * long after `app.whenReady()`, and a guard that can never fire is a claim that it can.
  */
 function toDip(rect: ScreenRect): ScreenRect {
-  return eqBoundsInDip(rect, (r) => screen.screenToDipRect(null, r))
+  return eqBoundsInDip(rect, (r) => {
+    try {
+      return screen.screenToDipRect(null, r)
+    } catch {
+      return r
+    }
+  })
 }
 
 function applyRecord(rec: PresenceRecord): void {
@@ -300,6 +309,14 @@ function applyRecord(rec: PresenceRecord): void {
   // it moves no presence fact. It goes straight to whoever asked — see the section at the foot.
   if (rec.t === 'hover') {
     emitHover(rec)
+    return
+  }
+  // 0.2.19 — the ring's live point, straight through to whoever draws it, exactly the hover
+  // routing's shape: a position is a question main asked the watcher to watch (a click-through
+  // ring cannot read the pointer itself while the game owns the screen), never a fact of the
+  // `PresenceState` snapshot, and its only consumer is the ring's stream.
+  if (rec.t === 'point') {
+    emitRingPoint(rec.point)
     return
   }
   // ANY record means we have actually looked (the watcher emits a `C`, an `F` and an `R` on its
@@ -639,7 +656,12 @@ function handleWatcherGone(w: Worker, code: number | null): void {
 }
 
 function startWatcher(): void {
-  if (watcher || E2E || process.platform !== 'win32') return
+  // 0.2.16 — THE WIN32-ONLY GATE IS GONE. Presence was once a Windows-only feature because the
+  // watcher could only ask Win32 (the `user32` FFI load threw everywhere else); since the X11
+  // surface (`presenceNativeX11.ts`) answers the same four questions, the watcher starts on
+  // Linux too — which is what makes the cursor ring (and the hover sensor, and auto-hide) exist
+  // on this fork at all. E2E stays excluded: no watcher, no windows, no presence to report.
+  if (watcher || E2E) return
   const init: PresenceWorkerInit = {
     eqRootWithSep: eqRootPrefix(effectiveEqRoot()),
     runningPollMs: RUNNING_POLL_MS,
@@ -817,6 +839,25 @@ export interface HoverTransition {
 }
 
 const hoverListeners = new Set<(t: HoverTransition) => void>()
+
+/** The ring's live-point listeners — the `P|x|y` record's fanout, the hover listeners' shape. */
+const ringPointListeners = new Set<(p: CursorPoint) => void>()
+
+/** Subscribe to the watcher's live pointer reads (physical pixels, like the hover wire). */
+export function subscribeRingPoint(cb: (p: CursorPoint) => void): () => void {
+  ringPointListeners.add(cb)
+  return () => ringPointListeners.delete(cb)
+}
+
+function emitRingPoint(p: CursorPoint): void {
+  for (const cb of ringPointListeners) {
+    try {
+      cb(p)
+    } catch (err) {
+      logError('main:presence', err)
+    }
+  }
+}
 /**
  * The zone lines in force, by key — so a RESTARTED watcher is handed them again on its first
  * breath. Without this, a wedged thread's replacement would come up blind and a pinned overlay

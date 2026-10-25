@@ -192,7 +192,7 @@ test('callback: the happy path stores the result, drops the pending row, and sho
   const html = await res.text()
   assert.match(html, /Connected/)
   assert.match(html, /#raid-logs/, 'the channel name is shown')
-  assert.match(html, /go back to EQ Zera/)
+  assert.match(html, /go back to Brujoloco EQL/)
   assert.ok(!html.includes(WEBHOOK_TOKEN), 'the token never reaches a browser')
   assert.ok(!html.includes(WEBHOOK_ID), 'nor the webhook id')
   assert.ok(!html.includes('<script'), 'the notice page has no script')

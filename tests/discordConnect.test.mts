@@ -251,8 +251,8 @@ test('the sentences are the agreed ones, and none of them names a status code or
   const cases: [Reply, string][] = [
     [{ status: 404, body: { error: 'not-found' } }, 'Discord did not complete the connection. Try again.'],
     [{ status: 503, body: { error: 'discord-off' } }, 'The share service is not set up for Discord yet.'],
-    [{ status: 400, body: { error: 'bad-state' } }, 'EQ Zera could not connect that channel. Try again.'],
-    [{ status: 0 }, 'Could not reach the EQ Zera service.']
+    [{ status: 400, body: { error: 'bad-state' } }, 'Brujoloco EQL could not connect that channel. Try again.'],
+    [{ status: 0 }, 'Could not reach the Brujoloco EQL service.']
   ]
   for (const [reply, sentence] of cases) {
     const { deps } = fakeFetch([reply])

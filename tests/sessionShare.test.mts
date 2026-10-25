@@ -239,7 +239,7 @@ test('discordSessionEmbed names the attachment exactly when one travelled', () =
   assert.equal(embed.description, sessionShareText(s))
   assert.equal(embed.color, 0x5ee6ff)
   assert.equal(embed.image?.url, `attachment://${SESSION_CARD_FILE}`)
-  assert.equal(embed.footer?.text, 'EQ Zera · eqzera.com')
+  assert.equal(embed.footer?.text, 'Brujoloco EQL')
   assert.equal(embed.timestamp, new Date(T1).toISOString())
   assert.deepEqual(
     embed.fields?.map((f) => [f.name, f.value, f.inline]),

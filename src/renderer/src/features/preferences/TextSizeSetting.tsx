@@ -96,8 +96,9 @@ const ALPHA_WORDS =
  * unchanged: it is what the rail's testid, the deep link and every existing e2e step address it by,
  * and renaming an id to match a label is how a working route breaks for a cosmetic reason.
  *
- * TWO ITEMS, in this order, which is the hierarchy the owner asked for: what the APP draws at, then
- * what the floating windows draw at.
+ * THREE ITEMS, in this order, which is the hierarchy the owner asked for: the theme the whole app
+ * draws in (the fork's Theme picker, 0.1.0), what the APP draws at, then what the floating
+ * windows draw at.
  */
 export function appearanceSection(): PrefSection {
   return {

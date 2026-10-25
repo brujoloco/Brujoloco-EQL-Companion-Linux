@@ -402,7 +402,7 @@ test('the manifest is installable and names only icons this service serves', asy
     scope: string
     icons: { src: string; sizes: string }[]
   }
-  assert.equal(body.name, 'EQ Zera')
+  assert.equal(body.name, 'Brujoloco EQL')
   assert.equal(body.display, 'standalone')
   assert.equal(body.scope, '/phone/')
   assert.deepEqual(body.icons.map((i) => i.src), ['/logo.png'])

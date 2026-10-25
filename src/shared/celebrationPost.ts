@@ -208,7 +208,7 @@ const FALLBACK_COLOR = 0x5ee6ff
 
 /** The footer every EQ Zera embed wears. Matched to `discordFightEmbed`'s, deliberately: two
  *  spellings would be two products as far as anybody scrolling the channel is concerned. */
-const FOOTER = 'EQ Zera · eqzera.com'
+const FOOTER = 'Brujoloco EQL'
 
 /**
  * The lines under the title: the card's own subtitle, then the reward's NAME, then one line per

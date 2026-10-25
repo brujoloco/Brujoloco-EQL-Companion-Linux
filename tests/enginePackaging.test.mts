@@ -81,11 +81,16 @@ function listEntries(key: string): string[] {
   return out
 }
 
-/** The one `extraResources` matcher, as the three fields that decide everything below. */
-function engineMatcher(): { from: string; to: string; filter: string } {
-  const block = /extraResources:\n\s*- from: (\S+)\n\s*to: (\S+)\n\s*filter:\n\s*- (\S+)\n/.exec(builderYml)
+/** The one `extraResources` matcher, as the fields that decide everything below. `filters` is
+ *  the whole `- ` list under `filter:` — the Linux Edition ships BOTH cargo names (`zengine`,
+ *  `zengine.exe`) so the one matcher serves every host, and comment lines between the entries
+ *  are not entries. */
+function engineMatcher(): { from: string; to: string; filters: string[] } {
+  const block = /extraResources:\n\s*- from: (\S+)\n\s*to: (\S+)\n\s*filter:\n((?:[ \t]*#[^\n]*\n|[ \t]*-[ \t]+\S+\n)+)/.exec(builderYml)
   assert.ok(block, 'electron-builder.yml must ship the engine via an extraResources matcher')
-  return { from: block[1], to: block[2], filter: block[3] }
+  const filters = [...block[3].matchAll(/-[ \t]+(\S+)/g)].map((m) => m[1])
+  assert.ok(filters.length > 0, 'the engine matcher must name at least one filter')
+  return { from: block[1], to: block[2], filters }
 }
 
 // =========================================================================================
@@ -93,32 +98,43 @@ function engineMatcher(): { from: string; to: string; filter: string } {
 // =========================================================================================
 
 test('THE SHIPPED PATH IS THE PROBED PATH — composed, not restated', () => {
-  const { to, filter } = engineMatcher()
+  const { to, filters } = engineMatcher()
   // `to` is relative to the packaged `resources/` directory (extraResources' base), so the file's
   // packaged address is exactly this. `resourcesPath` is a stand-in: what is being compared is the
-  // SHAPE below the resources root, which is the half the two files have to agree on.
-  const shipped = `RES/${to}/${filter}`
+  // SHAPE below the resources root, which is the half the two files have to agree on. The name in
+  // the address is the resolver's own constant, and the matcher must LIST that constant among its
+  // filters so what was shipped is what gets probed — the Linux Edition lists both cargo names and
+  // this host's constant picks its own.
+  const shipped = `RES/${to}/${ENGINE_BIN_NAME}`
   const [firstPackagedCandidate] = engineBinaryCandidates({
     appPath: '',
     resourcesPath: 'RES'
   })
+  assert.ok(
+    filters.includes(ENGINE_BIN_NAME),
+    'the matcher must list the resolver own constant (ENGINE_BIN_NAME) among its filters'
+  )
   assert.equal(
     shipped,
     firstPackagedCandidate,
     'electron-builder must put the engine where engineBinaryCandidates looks FIRST among the ' +
       'packaged candidates — a mismatch here is a packaged app that silently runs with no engine'
   )
-  // …and the name is the resolver's own constant rather than a second spelling of it.
-  assert.equal(filter, ENGINE_BIN_NAME)
 })
 
 test('the binary comes out of cargo`s RELEASE directory, and only the binary does', () => {
-  const { from, filter } = engineMatcher()
+  const { from, filters } = engineMatcher()
   assert.equal(from, 'engine/target/release')
   // The filter is load-bearing for SIZE, not just tidiness: `engine/target/release` also holds
-  // deps/, build/, incremental/ and a 1.6 MB .pdb. `createFilter` prunes a non-matching directory
-  // before walking into it, so the copy visits one file.
-  assert.equal(filter, 'zengine.exe')
+  // deps/, build/, incremental/ and the debug info cargo leaves beside the binary. Both cargo
+  // names are listed — `zengine` on Linux/macOS, `zengine.exe` on Windows — and on any host only
+  // the one cargo produced for that target matches, so `createFilter` prunes a non-matching
+  // directory before walking into it and the copy visits one file.
+  assert.deepEqual(
+    filters,
+    ['zengine', 'zengine.exe'],
+    'the matcher copies exactly the two cargo names and nothing else from the release tree'
+  )
 })
 
 test('the engine is NOT in `files`, and therefore needs no asarUnpack entry', () => {
@@ -172,8 +188,13 @@ test('nothing in the config narrows the signable set out from under the engine',
   assert.equal(/^\s*signExts:/m.test(builderYml), false, 'signExts would replace the .exe default')
   assert.equal(/signExecutable: false/.test(builderYml), false)
   assert.equal(/signAndEditExecutable: false/.test(builderYml), false)
-  // …and the file that gets signed has to be the extension `shouldSignFile` recognises.
-  assert.match(engineMatcher().filter, /\.exe$/)
+  // …and the file that gets signed has to be the extension `shouldSignFile` recognises: the
+  // Windows engine name, which is the `.exe` the matcher also lists (a Windows build ships
+  // `zengine.exe`; this Linux build ships `zengine` and AppImages are not Authenticode-signed).
+  assert.ok(
+    engineMatcher().filters.includes('zengine.exe'),
+    'the Windows engine name must stay in the matcher so a Windows build signs a recognisable file'
+  )
 })
 
 // =========================================================================================

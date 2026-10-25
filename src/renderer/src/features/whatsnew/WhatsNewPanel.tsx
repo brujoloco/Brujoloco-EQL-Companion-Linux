@@ -65,7 +65,7 @@ import { WhatsNewDevRow } from './WhatsNewDevRow'
  * here, never the first, and a link that scrolled away with the history would be a door that
  * moves.
  */
-const GITHUB_RELEASES_URL = 'https://github.com/Zeratfule/EQ-Zera/releases'
+const GITHUB_RELEASES_URL = 'https://github.com/brujoloco/Brujoloco-EQL-Companion-Linux/releases'
 
 /** What each `kind` is called in front of a person. Entries with no kind get no sub-header at
  *  all — that is the shape of the backfilled releases, which drew no such distinction. */

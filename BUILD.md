@@ -275,3 +275,17 @@ those terms.
 
 **Target artifact:** `release/0.1.0/Brujoloco EQL Companion-0.1.0.AppImage`
 (~156 MB, 36 themes, native `zengine` engine bundled).
+---
+
+## 13. Versioning (Brujoloco convention)
+
+Every change to the AppImage is a **new version, never an overwrite**:
+
+1. Bump `version` in `package.json` (patch bump: `0.2.0` → `0.2.1` → `0.2.2` …).
+2. Add the matching entry to `src/shared/releaseNotes.ts` (newest first).
+3. Build; `electron-builder` writes `release/<version>/` automatically.
+4. Copy the AppImage to a **fresh directory** named for the new version:
+   `~/projects/Brujoloco-EQL-Companion-<version>/Brujoloco EQL Companion-<version>.AppImage`
+
+No two builds with different contents share a version number or a directory.
+Rolling back means picking the older directory, not rebuilding.

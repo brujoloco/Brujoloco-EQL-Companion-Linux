@@ -49,9 +49,9 @@ const TABS: readonly [string, string][] = [
 function firstRun(): string {
   return (
     `<div id="first" class="first hide">` +
-    `<h1>EQ Zera</h1>` +
-    `<p class="muted">This page is a second screen for EQ Zera on your PC. It needs to be paired once.</p>` +
-    `<ol><li>Open EQ Zera on your PC.</li>` +
+    `<h1>Brujoloco EQL</h1>` +
+    `<p class="muted">This page is a second screen for Brujoloco EQL on your PC. It needs to be paired once.</p>` +
+    `<ol><li>Open Brujoloco EQL on your PC.</li>` +
     `<li>Go to Preferences, then Sharing.</li>` +
     `<li>Turn on <b>Send live data to my phone</b>.</li>` +
     `<li>Press <b>Pair a phone</b> and scan the code.</li></ol>` +
@@ -67,7 +67,7 @@ function shell(): string {
   ).join('')
   return (
     `<div id="app" class="hide">` +
-    `<header class="top"><span id="who" class="who">EQ Zera</span>` +
+    `<header class="top"><span id="who" class="who">Brujoloco EQL</span>` +
     `<span id="pill" class="pill">Connecting</span>` +
     `<span id="sub" class="sub"></span></header>` +
     `<main><div id="body"></div>` +
@@ -86,13 +86,13 @@ export function phonePageHtml(nonce: string): string {
     `<meta name="theme-color" content="${THEME}">` +
     `<meta name="mobile-web-app-capable" content="yes">` +
     `<meta name="apple-mobile-web-app-capable" content="yes">` +
-    `<meta name="apple-mobile-web-app-title" content="EQ Zera">` +
+    `<meta name="apple-mobile-web-app-title" content="Brujoloco EQL">` +
     `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` +
     `<meta name="robots" content="noindex">` +
     `<link rel="manifest" href="/phone/manifest.webmanifest">` +
     `<link rel="icon" href="/logo.png">` +
     `<link rel="apple-touch-icon" href="/logo.png">` +
-    `<title>EQ Zera</title>` +
+    `<title>Brujoloco EQL</title>` +
     `<style nonce="${nonce}">${PHONE_STYLE}</style>` +
     `</head><body>` +
     firstRun() +
@@ -152,8 +152,8 @@ export function phonePage(origin: string): Response {
  */
 export function phoneManifest(): Response {
   const body = {
-    name: 'EQ Zera',
-    short_name: 'EQ Zera',
+    name: 'Brujoloco EQL',
+    short_name: 'Brujoloco EQL',
     description: 'Your live EverQuest Legends meters, timers and character, on your phone.',
     start_url: '/phone/',
     scope: '/phone/',

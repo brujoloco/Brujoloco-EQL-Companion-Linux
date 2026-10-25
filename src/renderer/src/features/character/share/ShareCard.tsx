@@ -51,7 +51,7 @@ function CardHeader({ profile }: { profile: CharacterProfileShare }): JSX.Elemen
       <Typography
         sx={{ fontFamily: FONTS.display, fontSize: 13, letterSpacing: 2, color: PALETTE.accent, flexShrink: 0 }}
       >
-        EQ ZERA
+        BRUJOLOCO EQL
       </Typography>
     </Stack>
   )

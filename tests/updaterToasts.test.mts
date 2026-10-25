@@ -50,12 +50,12 @@ const read = (p: string): string => readFileSync(join(ROOT, p), 'utf8')
 
 // ---- 1. the two switches ---------------------------------------------------------------
 
-test('self-update is ON: the fork switch returns false', () => {
+test('self-update is OFF in this build: the fork switch returns true', () => {
   const src = read('src/main/updater.ts')
   assert.match(
     src,
-    /function autoUpdateDisabled\(\): boolean \{\s*return false\s*\}/,
-    'AUTO_UPDATE_DISABLED must be false — the updater ships enabled (owner, 2026-09-08)'
+    /function autoUpdateDisabled\(\): boolean \{\s*(?:\/\/[^\n]*\n\s*)*return true\s*\}/,
+    'AUTO_UPDATE_DISABLED must be true - the upstream EQ Zera release feed cannot serve this Linux Edition, so the updater ships disabled (BUILD.md, Releasing; the comment in updater.ts says how to re-enable)'
   )
 })
 
@@ -101,7 +101,7 @@ test('the available card offers the DOWNLOAD, in the words the button prints', (
   const card = updateAvailableToast('1.4.0')
   assert.equal(card.kind, 'update')
   assert.equal(card.id, 'update:1.4.0')
-  assert.equal(card.title, 'EQ Zera 1.4.0 is ready')
+  assert.equal(card.title, 'Brujoloco EQL 1.4.0 is ready')
   assert.equal(card.subtitle, 'Click to download and install')
   assert.equal(card.action, 'updateDownload')
   assert.equal(updateActionLabel('updateDownload'), 'Download and install')
@@ -109,7 +109,7 @@ test('the available card offers the DOWNLOAD, in the words the button prints', (
 
 test('the downloaded card offers the INSTALL, and never the download again', () => {
   const card = updateDownloadedToast('1.4.0')
-  assert.equal(card.title, 'EQ Zera 1.4.0 downloaded')
+  assert.equal(card.title, 'Brujoloco EQL 1.4.0 downloaded')
   assert.equal(card.subtitle, 'Click to restart and install')
   assert.equal(card.action, 'updateInstall')
   assert.equal(updateActionLabel('updateInstall'), 'Restart to install')
@@ -140,8 +140,8 @@ test('ONE ID FOR ONE UPDATE: the three states refresh the same card instead of s
 test('a version the feed did not name still gets an honest card, never a blank one', () => {
   const card = updateAvailableToast(undefined)
   assert.equal(card.id, 'update:pending')
-  assert.equal(card.title, 'The EQ Zera update is ready')
-  assert.equal(updateAvailableToast('   ').title, 'The EQ Zera update is ready')
+  assert.equal(card.title, 'The Brujoloco EQL update is ready')
+  assert.equal(updateAvailableToast('   ').title, 'The Brujoloco EQL update is ready')
 })
 
 test('the failure card says what failed, offers nothing, and is its OWN card', () => {

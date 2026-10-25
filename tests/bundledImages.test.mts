@@ -45,10 +45,15 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 
 // ---- the probe ----------------------------------------------------------------------
 
+// An ABSOLUTE base for the fixture paths, per platform: the probe suite asserts every root is
+// absolute, and a Windows-style drive prefix ('C:/app') is not an absolute path on POSIX - the
+// Linux Edition runs this suite on Linux, so the fixture base follows the host.
+const BASE = process.platform === 'win32' ? 'C:\\' : '/'
+
 const PATHS = {
-  appPath: join('C:', 'app', 'resources', 'app.asar'),
-  resourcesPath: join('C:', 'app', 'resources'),
-  cwd: join('C:', 'checkout')
+  appPath: join(BASE, 'app', 'resources', 'app.asar'),
+  resourcesPath: join(BASE, 'app', 'resources'),
+  cwd: join(BASE, 'checkout')
 }
 
 test('bundledImageRoots tries the asar, then the unpacked copy, then resources, then cwd', () => {

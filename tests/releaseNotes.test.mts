@@ -125,12 +125,10 @@ test('releaseNotesProblems CATCHES the mistakes this file will actually acquire'
  * that makes an introduction stand out is gone and the panel is a wall of prose.
  */
 const INTRODUCTIONS: readonly { version: string; bullets: number }[] = [
-  // 0.9.0: the What's new panel (3) and the "This week" lockout view (3).
-  { version: '0.9.0', bullets: 3 },
-  // 0.4.0: the exaltation planner (3) and the celebration cards (3).
-  { version: '0.4.0', bullets: 3 },
-  // 0.3.0: in-app feedback (3).
-  { version: '0.3.0', bullets: 3 }
+  // No fork release has introduced a surface as a minority of its own bullets: 0.1.0 IS the
+  // release (eleven bullets, pinned as a total in the counts test below), and every release
+  // after it fixes or adds one panel at a time. The list stays empty until a release spends
+  // extra bullets introducing a surface — and then the cap below is what guards it.
 ]
 
 /** The cap the owner set: an introduction may spend at most five bullets on itself. */
@@ -147,30 +145,25 @@ test('an introduction stays under the five-bullet cap', () => {
 
 test('a release states one change per bullet, and multi-change releases have several', () => {
   const counts = new Map(RELEASE_NOTES.map((n) => [n.version, n.entries.length]))
-  // The two releases authored with full per-change detail keep it…
-  assert.equal(counts.get('0.8.0'), 6)
-  assert.equal(counts.get('0.7.0'), 6)
-  // …the ordinary backfilled releases stay at one bullet per change…
-  for (const v of ['0.6.3', '0.6.2', '0.6.0', '0.5.0', '0.3.5', '0.3.1', '0.2.0']) {
-    const n = counts.get(v) ?? 0
-    assert.ok(n >= 2 && n <= 4, `v${v} should be 2-4 bullets, got ${String(n)}`)
-  }
-  // …and the releases that introduced a surface are LARGER, by exactly the extra bullets those
-  // introductions spend. Pinned as totals so a surface's prose cannot quietly grow unbounded.
-  assert.equal(counts.get('0.9.0'), 9, 'five changes, two of them introductions worth 3 bullets each')
-  assert.equal(counts.get('0.4.0'), 8, 'four changes, two of them introductions worth 3 bullets each')
-  assert.equal(counts.get('0.3.0'), 6, 'four changes, one of them an introduction worth 3 bullets')
-  // Releases that genuinely did one thing stay at one bullet — padding them would be inventing.
-  for (const v of ['0.6.1', '0.3.4', '0.3.2', '0.2.1']) {
-    assert.equal(counts.get(v), 1, `v${v} did one thing and should say so once`)
+  // The founding release is the one authored with full per-change detail — every surface it
+  // shipped, one bullet each. Pinned as a total so the founding prose cannot quietly grow.
+  assert.equal(counts.get('0.1.0'), 11, "the Linux Edition's founding release")
+  // THE CONSOLIDATED 0.2 SERIES (0.2.23, the owner's ask): four bullets, one per thing the
+  // series did — the panels, the unlock-all bulk pin, the cursor ring, the icons. Pinned as
+  // four so a fifth bullet can only arrive as a deliberate release, never as prose drift.
+  assert.equal(counts.get('0.2.23'), 4, 'the 0.2 series: overlays, unlock-all, cursor ring, icons')
+  // …and the intermediate version numbers the series consumed are GONE — the twenty-one
+  // granular entries were the owner's explicit ask to drop.
+  for (const v of ['0.2.0', '0.2.3', '0.2.9', '0.2.14', '0.2.21']) {
+    assert.equal(counts.get(v), undefined, `v${v} is folded into the consolidated block, not listed`)
   }
 })
 
 // A BULLET IS SHORT (owner, 2026-09-03). Three sentences at most — the outcome, optionally why it
 // was wrong, optionally what changed — and a character ceiling so three sentences cannot become
-// three paragraphs. Applied from 1.16.0 on: the older entries were written before the rule and
-// are history, not a template (the file header states the shape).
-const SHORT_NOTES_FROM = '1.16.0'
+// three paragraphs. This fork adopts the rule at 0.2.12: everything it shipped before that was
+// written in its first sessions and is history, not a template.
+const SHORT_NOTES_FROM = '0.2.12'
 const MAX_NOTE_SENTENCES = 3
 const MAX_NOTE_CHARS = 320
 
@@ -178,7 +171,7 @@ function sentencesOf(text: string): number {
   return (text.match(/[.!?](\s|$)/g) ?? []).length
 }
 
-test('a release note bullet is short: three sentences and 320 characters at most, from 1.16.0 on', () => {
+test('a release note bullet is short: three sentences and 320 characters at most, from 0.2.12 on', () => {
   const governed = RELEASE_NOTES.filter((n) => compareVersions(n.version, SHORT_NOTES_FROM) >= 0)
   assert.ok(governed.length >= 1, 'the rule governs at least the release that introduced it')
   for (const note of governed) {
@@ -202,18 +195,11 @@ test('THANKS IS EARNED: only tagged entries carry the flag, and only tagged rele
   const tagged = new Map(
     RELEASE_NOTES.map((n) => [n.version, n.entries.filter((e) => e.fromReport === true).length])
   )
-  // The releases whose work traceably came from player reports (each cited in the commit that
-  // did it — a report id, "the YouTube report", "Mac/CrossOver user report").
-  assert.equal(tagged.get('0.8.0'), 5)
-  assert.equal(tagged.get('0.7.0'), 3)
-  assert.equal(tagged.get('0.6.3'), 1)
-  assert.equal(tagged.get('0.6.1'), 1)
-  assert.equal(tagged.get('0.6.0'), 2)
-  assert.equal(tagged.get('0.5.0'), 1)
-  // …and everything else is UNTAGGED. An unearned thanks costs more than a missing one, so the
-  // releases whose defects the owner found himself (0.3.4's charm broadcast) do not claim one.
-  for (const v of ['0.6.2', '0.4.0', '0.3.5', '0.3.4', '0.3.2', '0.3.1', '0.3.0', '0.2.1', '0.2.0']) {
-    assert.equal(tagged.get(v), 0, `v${v} has no traceable report behind it and must not thank`)
+  // No fork release has yet shipped work traceably cited to a player report — every defect so
+  // far was owner-found, and thanking the community for the owner's own reports would make the
+  // chip mean nothing. The first release that genuinely cites one flips its pin here.
+  for (const n of RELEASE_NOTES) {
+    assert.equal(tagged.get(n.version), 0, `v${n.version} has no traceable report behind it and must not thank`)
   }
 })
 
@@ -225,8 +211,15 @@ test('hasReportedEntry decides the thanks line, and agrees with the entries', ()
       `v${n.version}`
     )
   }
-  assert.equal(hasReportedEntry(RELEASE_NOTES.find((n) => n.version === '0.8.0')!), true)
-  assert.equal(hasReportedEntry(RELEASE_NOTES.find((n) => n.version === '0.2.0')!), false)
+  // No committed release carries a tag, so the TRUE case is synthetic: the function decides
+  // from the entries alone, and the first genuinely tagged release will read through the same door.
+  const synthetic = (fromReport?: boolean): ReleaseNote => ({
+    version: '0.0.0',
+    date: '2026-01-01',
+    entries: [{ text: 'A bullet.', fromReport }]
+  })
+  assert.equal(hasReportedEntry(synthetic(true)), true)
+  assert.equal(hasReportedEntry(synthetic()), false)
 })
 
 test('NOBODY IS EVER NAMED — no entry carries a report id, a handle or a contact', () => {

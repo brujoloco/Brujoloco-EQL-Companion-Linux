@@ -80,7 +80,7 @@ test('every route is built from that origin and nothing else', () => {
 test('the dev gate opens only for an unpackaged Electron dev run', () => {
   assert.equal(devShareOriginFor(DEV), 'http://127.0.0.1:8788')
   // PACKAGED — the exe is not electron.exe, which is Electron's own isPackaged definition.
-  assert.equal(devShareOriginFor({ ...DEV, execPath: 'C:\\Program Files\\EQ Zera\\EQ Zera.exe' }), '')
+  assert.equal(devShareOriginFor({ ...DEV, execPath: 'C:\\Program Files\\Brujoloco EQL\\Brujoloco EQL.exe' }), '')
   // An exe name we do not recognize reads as packaged: fail-closed, always.
   assert.equal(devShareOriginFor({ ...DEV, execPath: 'C:\\x\\something.exe' }), '')
   // The headless harness never publishes, so it never unlocks either.

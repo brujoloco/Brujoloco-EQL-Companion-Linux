@@ -217,7 +217,7 @@ test('the dev gate opens for an unpackaged Electron process with a loopback url'
 
 test('THE PACKAGED PROOF: the gate is shut, and the env var does nothing at all', () => {
   // The packaged case as a VALUE — a real installed build's exe, everything else identical.
-  const packaged = facts({ execPath: 'C:\\Users\\me\\AppData\\Local\\Programs\\eq-zera\\EQ Zera.exe' })
+  const packaged = facts({ execPath: 'C:\\Users\\me\\AppData\\Local\\Programs\\eq-zera\\Brujoloco EQL.exe' })
   assert.equal(net.devUnlocked(packaged), false)
   assert.equal(net.devEndpointFor(packaged), '')
   // ...and with the gate shut, `allowedUploadUrlFor` is the function it was before the dev

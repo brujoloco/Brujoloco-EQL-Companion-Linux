@@ -61,7 +61,7 @@ function SessionCardHeader({ session }: { session: SessionShare }): JSX.Element 
       <Typography
         sx={{ fontFamily: FONTS.display, fontSize: 13, letterSpacing: 2, color: PALETTE.accent, flexShrink: 0 }}
       >
-        EQ ZERA
+        BRUJOLOCO EQL
       </Typography>
     </Stack>
   )
@@ -200,7 +200,7 @@ export default function SessionCard({ session }: { session: SessionShare }): JSX
       <SessionCardBest session={session} />
       <SessionCardDrops session={session} />
       <Typography variant="caption" sx={{ color: 'text.disabled', alignSelf: 'flex-end' }}>
-        EQ Zera
+        Brujoloco EQL
       </Typography>
     </Box>
   )

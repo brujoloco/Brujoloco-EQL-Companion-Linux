@@ -1,6 +1,6 @@
 {
   "id": "eq-zera-console",
-  "name": "EQ Zera Console",
+  "name": "Brujoloco EQL Console",
   "license": "CC0-1.0 (original, synthesized by scripts/gen-sounds.mts)",
   "sounds": {
     "session-start-power-01": {

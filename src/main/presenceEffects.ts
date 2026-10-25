@@ -54,7 +54,13 @@
 import { screen, type BrowserWindow } from 'electron'
 import { IPC } from '../shared/ipc'
 import { logError } from './errorLog'
-import { presenceSnapshot, setCursorWatch, stopPresence, subscribePresence } from './presence'
+import {
+  presenceSnapshot,
+  setCursorWatch,
+  stopPresence,
+  subscribePresence,
+  subscribeRingPoint
+} from './presence'
 import {
   CURSOR_POLL_MS,
   cursorRingActive,
@@ -91,6 +97,22 @@ let ringOrigin: ScreenRect | null = null
 let lastSent: CursorPoint | null = null
 let sends = 0
 let samples = 0
+/** The watcher's latest live pointer read, converted to DIP at arrival rate — or null until
+ *  the watcher's first `P` line lands (the stream then falls back to Electron's read). */
+let lastWorkerPoint: CursorPoint | null = null
+/** The ring-point subscription, torn down with the presence subscription in the !needed pass. */
+let unsubRingPoint: (() => void) | null = null
+
+/** PHYSICAL→DIP for a point, with the same guarded identity `toDip` in presence.ts established
+ *  (0.2.18): `screenToDipPoint` is a Windows/macOS API Electron 43 does not ship on Linux.
+ *  Runs at the watcher's change rate, not the stream's sample rate. */
+const dipPoint = (p: CursorPoint): CursorPoint => {
+  try {
+    return screen.screenToDipPoint(p)
+  } catch {
+    return p
+  }
+}
 
 /**
  * MEASUREMENT SEAM. `samples` counts `getCursorScreenPoint()` calls, `sends` counts IPC
@@ -120,19 +142,28 @@ function sendPoint(w: BrowserWindow, next: CursorPoint): void {
  * One cursor sample: read the pointer, convert to the ring window's own CSS px, send if it moved.
  * Kept tiny on purpose — this is the only code in the app that runs at 125 Hz.
  *
- * BOTH READINGS ARE DIP — `screen.getCursorScreenPoint()` and the cached `getBounds()` origin —
- * so the difference is a DIP offset, and it is a CSS pixel offset only while the ring window is
- * drawn at zoom 1. That is not an assumption, it is pinned at the far end
+ * BOTH READINGS ARE DIP — the worker's point (converted once at arrival, `dipPoint` above)
+ * or Electron's read, and the cached `getBounds()` origin — so the difference is a DIP offset,
+ * and it is a CSS pixel offset only while the ring window is drawn at zoom 1. That is not an
+ * assumption, it is pinned at the far end
  * (`webFrame.setZoomLevel(0)` in src/preload/cursor.ts, JOS-154, with the measurement). No zoom
  * arithmetic belongs in this function: it runs 125 times a second, and a division here would be
  * paying per sample for a constant that is fixed at 1 for the life of the window.
+ *
+ * THE WORKER'S POINT IS THE PRIMARY SOURCE (0.2.19), and the reason is a measured platform fact:
+ * `screen.getCursorScreenPoint()` on X11 is not a query — it is the last pointer event THIS APP
+ * saw, and the ring's window is click-through, so while the game owns the screen the app sees no
+ * events and Electron's answer freezes where focus changed hands (probe, 2026-10-25: a warped
+ * pointer moved the raw X read and left Electron's untouched). The watcher's per-tick
+ * `cursorShowing` read is live on every platform, so the ring rides it; Electron's read stays
+ * as the pre-first-`P` fallback and nothing else.
  */
 function sampleCursor(): void {
   const w = getCursorRingWindow()
   const origin = ringOrigin
   if (!w || w.isDestroyed() || !origin) return
   samples++
-  const p = screen.getCursorScreenPoint()
+  const p = lastWorkerPoint ?? screen.getCursorScreenPoint()
   const x = p.x - origin.x
   const y = p.y - origin.y
   const inside = x >= 0 && y >= 0 && x <= origin.width && y <= origin.height
@@ -312,6 +343,9 @@ export function refreshPresenceEffects(): void {
   if (!needed) {
     unsubscribe?.()
     unsubscribe = null
+    unsubRingPoint?.()
+    unsubRingPoint = null
+    lastWorkerPoint = null
     stopStream()
     ringOrigin = null
     destroyCursorRingWindow()
@@ -330,6 +364,12 @@ export function refreshPresenceEffects(): void {
   // Push the (possibly resized) ring config to a live ring window so a Preferences slider
   // resizes the halo under the user's pointer instead of on the next restart.
   getCursorRingWindow()?.webContents.send(IPC.onCursorRingConfig, ring)
+  // 0.2.19 — the ring's live point arrives from the watcher, converted to DIP on arrival.
+  if (!unsubRingPoint) {
+    unsubRingPoint = subscribeRingPoint((p) => {
+      lastWorkerPoint = dipPoint(p)
+    })
+  }
   if (!unsubscribe) {
     // subscribePresence fires the callback immediately with what is already known, so this
     // single call both starts the watcher and applies the current state.

@@ -1,6 +1,6 @@
 {
   "name": "eql-companion-brujoloco",
-  "version": "0.1.0",
+  "version": "0.2.23",
   "license": "FSL-1.1-MIT",
   "description": "Brujoloco EQL Companion \u2014 the EverQuest Legends desktop companion (Linux Edition). Live log parsing, overlays, quests, gear and crafting.",
   "main": "./out/main/index.js",
