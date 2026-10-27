@@ -27,11 +27,6 @@ fork of [everquest-companion](https://github.com/jmoyers/everquest-companion) ("
 Companion") by Josh Moyers. I reworked it for my own Linux box — a native AppImage instead of a
 Windows installer — and added a few things on top. 🐧→📦
 
-## 🔨 Building
-
-See [`BUILD.md`](BUILD.md) for the complete build guide (Node v24, Rust 1.98.0, the full
-`npm ci` → `build:engine` → `build` → `electron-builder --linux AppImage` pipeline).
-
 ## 📜 License
 
 The upstream code (EverQuest Companion by Josh Moyers, and the EQ Zera additions by Jack Thomas)
