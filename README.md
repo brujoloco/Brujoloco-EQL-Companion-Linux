@@ -4,9 +4,6 @@ A native Linux 📦 **AppImage** companion for **EverQuest Legends**. It reads t
 already writes and turns it into live views: a DPS meter ⚔️, floating overlays, Plane of Sky quest
 tracking 🌤️, loot and item knowledge, XP/AA progress, raid-target history, buff timers ⏳, and
 sound alerts.
-<p align="center">
-<img src="screenshots/app-05.png" alt="Brujoloco EQL Companion">
-</p>
 
 
 
@@ -50,6 +47,10 @@ build is declared **final** as a delivered product for Linux; everyone is free t
 modify, fork, and redistribute it under those terms.
 
 ## 📸 Screenshots
+
+<p align="center">
+<img src="screenshots/app-05.png" alt="Brujoloco EQL Companion">
+</p>
 
 <p align="center">
 <img src="screenshots/app-02.png" alt="Brujoloco EQL Companion">
