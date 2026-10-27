@@ -1,0 +1,34 @@
+{{Spellpage|
+
+| spellname = Dominate Undead
+| spellicon = D
+| description = Commands an undead creature to do your bidding, temporarily bending them to your will.
+
+| classes = * [[Necromancer]] - Level 18
+| slots = 
+
+{{SpellSlotRow | 1 | Charm up to level 32 }}
+
+| skill = [[Skill Alteration | Alteration]]
+
+| mana = 100
+| range = 200
+| casting_time = 5.00
+| fizzle_time = 2.25
+| recast_time = 10.00
+| duration = 16 Min
+| target_type = Undead
+| spell_type = Detrimental
+| resist = Magic (0)
+
+| msg_cast_on_you =  
+| msg_cast_on_other = Someone  moans.
+| msg_wears_off =  
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+</ul>
+
+}}

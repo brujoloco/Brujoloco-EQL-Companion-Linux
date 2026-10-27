@@ -1,0 +1,65 @@
+EQ Zera
+=======
+
+This software is a derivative work of "everquest-companion" (EQ Legends Companion),
+Copyright (c) 2026 Josh Moyers, https://github.com/jmoyers/everquest-companion,
+licensed under the Functional Source License, Version 1.1, MIT Future License
+(FSL-1.1-MIT). The full license text is in the LICENSE file and applies to this
+derivative as well.
+
+Everything added or changed since the fork (September 2026 onward) is
+Copyright (c) 2026 Jack Thomas, https://github.com/Zeratfule/EQ-Zera, and is
+licensed under the same terms, FSL-1.1-MIT, with Jack Thomas as the licensor of
+those parts; each release's additions convert to MIT two years after that release.
+
+Under the FSL the original author's product names and trademarks are not licensed;
+this fork is therefore distributed under the name "EQ Zera" and is not affiliated
+with or endorsed by the original author.
+
+"EQ Zera", the EQZ mark and the eqzera.com name are trademarks of Jack Thomas and
+are likewise not licensed: the same Trademark clause of the license withholds them,
+so a further fork or redistribution must ship under its own name.
+
+Bundled data is scraped from eqlwiki.com under that wiki's terms. The bundled sound
+pack (resources/soundpacks/eq-zera-console/) is original to this fork, synthesized by
+scripts/gen-sounds.mts. Sound packs installed from the in-app browser are third-party
+and carry their own licenses and attribution in their own manifests.
+
+Bundled fonts (src/renderer/src/assets/fonts/): Orbitron, Copyright 2009 The Orbitron Project
+Authors (github.com/theleagueof/orbitron), and Share Tech Mono, Copyright 2012 Carrois Type
+Design (carrois.com). Both are licensed under the SIL Open Font License, Version 1.1
+(https://openfontlicense.org). Fetched by scripts/fetch-fonts.mts; latin subsets only.
+
+------------------------------------------------------------------------------
+Brujoloco EQL Companion — Linux Edition
+------------------------------------------------------------------------------
+
+Copyright (c) 2026 Brujoloco
+
+The Brujoloco Linux Edition additions to this software — the AppImage packaging,
+the runtime theme system (25+ palettes) with adaptive light/dark mode, the
+in-app rebrand, the disabled update/feedback surfaces, and the About-this-build
+section — are licensed under the MIT License:
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+
+This build is declared FINAL as a delivered product for Linux. Everyone is free
+to use, copy, modify, fork, and redistribute it — change it as you see fit.
+
+"Brujoloco EQL Companion" and the Brujoloco mark are not licensed for use by
+others; ship a further fork or redistribution under your own name.
+
+The upstream code (EverQuest Companion by Josh Moyers, and the EQ Zera
+additions by Jack Thomas) remains under its original FSL-1.1-MIT license — see
+LICENSE for those terms. The MIT grant above applies only to the Brujoloco
+Linux Edition additions.

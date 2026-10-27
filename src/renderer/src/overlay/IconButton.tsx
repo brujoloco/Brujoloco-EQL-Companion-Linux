@@ -1,0 +1,69 @@
+// The overlay windows' one button primitive: a 20px square, plain (no MUI — the overlay bundle
+// stays lean). All five overlay kinds use it for the lock/pin and close controls.
+//
+// `accentBg` is the only thing that ever differed between the copies this replaces: the damage
+// and event windows tint the pressed state violet, the healing pair tints it green, matching each
+// window's own accent so a pinned meter reads as one piece.
+
+import type { JSX } from 'react'
+import { PALETTE, withAlpha } from '../../../shared/palette'
+
+/** The damage/event overlays' pressed tint. */
+export const ICON_ACCENT_VIOLET = withAlpha(PALETTE.accent, 0.2)
+/** The healing overlays' pressed tint. */
+export const ICON_ACCENT_GREEN = 'rgba(127,209,160,0.2)'
+
+export function IconButton({
+  onClick,
+  label,
+  children,
+  danger,
+  accent,
+  testId,
+  accentBg = ICON_ACCENT_VIOLET,
+  background
+}: {
+  onClick: () => void
+  /** The accessible NAME of the button - never a tooltip (owner ruling 2026-08-16: no hover text anywhere on an overlay). */
+  label: string
+  children: React.ReactNode
+  danger?: boolean
+  accent?: boolean
+  /** A harness handle. The lock and close pair are found by their aria-label; a kind's own
+   *  control is found by name, because two kinds may spell theirs with the same glyph. */
+  testId?: string
+  accentBg?: string
+  /** A RESTING background for the button box (Linux Edition 0.2.11): the pin control is
+   *  solid so it reads as present on a click-through panel — the one control that must
+   *  never depend on a hover the click-through state cannot deliver. Default: the accent
+   *  tint when `accent`, else transparent, exactly as before. */
+  background?: string
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      {...(testId === undefined ? {} : { 'data-testid': testId })}
+      onClick={onClick}
+      style={{
+        width: 20,
+        height: 20,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: 'none',
+        borderRadius: 4,
+        cursor: 'pointer',
+        fontSize: 11,
+        lineHeight: 1,
+        background: background ?? (accent ? accentBg : 'transparent'),
+        color: danger ? PALETTE.red : 'inherit',
+        padding: 0
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = background ?? 'rgba(255,255,255,0.14)')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = background ?? (accent ? accentBg : 'transparent'))}
+    >
+      {children}
+    </button>
+  )
+}

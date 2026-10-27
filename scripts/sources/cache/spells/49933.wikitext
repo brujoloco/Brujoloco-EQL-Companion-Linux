@@ -1,0 +1,45 @@
+{{Spellpage|
+
+| spellname = Banish Undead
+| spellicon = C
+| description = A burst of holy power that inflicts 468 damage to an undead target.
+
+| classes = 
+
+* [[Cleric]] - Level 43
+* [[Necromancer]] - Level 46
+
+| items_with_effect = 
+
+<ul><li> {{:DawnFire, Morning Star of Light}}
+</li><li> {{:Staff of Undead Legions}}
+</li></ul>
+
+| slots = 
+
+{{SpellSlotRow | 1 | Decrease Hitpoints by 585 }}
+
+| skill = [[Skill Evocation | Evocation]]
+
+| mana = 118
+| range = 200
+| casting_time = 3.50
+| fizzle_time = 2.50
+| recast_time = 1.50
+| duration = Instant
+| target_type = Undead
+| spell_type = Detrimental
+| resist = Magic (-50)
+
+| msg_cast_on_you =  
+| msg_cast_on_other = Someone  staggers.
+| msg_wears_off =  
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+</ul>
+
+}}

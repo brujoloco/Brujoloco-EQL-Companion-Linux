@@ -1,0 +1,148 @@
+// IPC: the CHARACTER SHEET's door (JOS-45) — the armory grid, the gear sum, and the carry-all.
+//
+// IT WAS GATED, AND SINCE JOS-327 IT IS NOT. This handler used to be registered only when
+// `UNRELEASED` said so (src/main/unreleased.ts) — dev builds, or an explicit `EQ_UNRELEASED=1` —
+// because the surface had not passed the owner's review gate; in a packaged build the channel did
+// not exist and `window.eq.characterSheet()` rejected with Electron's own "No handler registered".
+// The owner released the tab (2026-08-13) as the gear area's last face, so the registration is
+// unconditional now and the promise the gate protected is simply no longer being made. What did
+// NOT change is the file boundary below, or the shape of the answer.
+//
+// It lives in its own file rather than in `character.ts` because that domain is the ACTIVE
+// CHARACTER (log tail, EQ dir, progress). It stayed its own file after the gate came off because
+// the reason had always been two reasons: a gate wants its own registration site, and a handler
+// that inlines an 8.6 MB item corpus wants to be readable on its own.
+//
+// WHY MAIN DOES THE JOIN. `items.json` is 8.6 MB and already inlined in this bundle (itemLookup.ts
+// owns the import; ipc/planner.ts imports the same module so it is inlined exactly once). Shipping
+// the corpus to the renderer to sum twenty-two items would be absurd, so main reads the dump,
+// looks each worn item up, sums the blocks and answers with one small object — the same division
+// of labour `planner:inventory` already uses.
+//
+// NOT CACHED, for the same reason `planner:inventory` is not: the dump is a file the player
+// rewrites mid-session on purpose, and a cache would hand the renderer the answer from before
+// they typed the command. No dump ⇒ `null`, which is the instructions card, never an error.
+
+import { ipcMain } from 'electron'
+import { IPC } from '../../shared/ipc'
+import { carryAll } from '../../shared/carryAll'
+import {
+  sheetCells,
+  sumGear,
+  type CharacterSheet,
+  type SheetCell,
+  type SheetCellView,
+  type SheetItem,
+  type SheetItemView,
+  type WornItemBlock
+} from '../../shared/characterSheet'
+import { loadInventoryDump } from '../outputs'
+import { getActiveCharacter } from '../session'
+import { buildItemDbIndex, itemKey, type ItemDbEntry, type ItemDbFile } from '../itemsDb'
+// The COMMITTED wiki item database — the same module itemLookup.ts imports, so the JSON is
+// inlined into the main bundle exactly once.
+import itemsJson from '../data/items.json'
+import itemModelsJson from '../data/itemModels.json'
+
+interface ItemModelsFile {
+  byId: Record<string, { name: string; model: string; material: number; color: number; itemtype: number }>
+}
+function itemModels(): ItemModelsFile {
+  return itemModelsJson
+}
+
+let index: Map<string, ItemDbEntry> | null = null
+
+/** The name→record index, built on first use and kept for the process's life (planner precedent). */
+function itemIndex(): Map<string, ItemDbEntry> {
+  index ??= buildItemDbIndex(itemsJson as unknown as ItemDbFile)
+  return index
+}
+
+/** One cell's item, joined to the committed DB. A miss is RECORDED, never smoothed over (law 12). */
+function joinCell(cell: SheetCell): SheetCellView {
+  if (!cell.item) return { ...cell, item: null }
+  const record = itemIndex().get(itemKey(cell.item.baseName))
+  const item: SheetItemView = { ...cell.item, known: record !== undefined }
+  if (record?.iconId !== undefined) item.iconId = record.iconId
+  // THE BLOCK TRAVELS, BASE (EQ Zera, 2026-09-09). Main is the only side that holds the item
+  // corpus, so main is the side that says what an item states - the totals below read this field
+  // rather than looking the item up a second time, and the share card's per-item hover reads it
+  // through the same `wornBlock` scaler the totals go through.
+  if (record?.stats !== undefined) item.block = record.stats
+  if (record?.stats?.skill !== undefined) item.skill = record.stats.skill
+  // The game's own look for the item AND for its ornament donor (EQ Zera): model, material and
+  // dye, each by the item id the dump wrote, so the model can wear whichever the toggle says.
+  const own = itemModels().byId[String(cell.item.itemId)]
+  if (own) {
+    if (own.model !== '') item.model = own.model
+    item.material = own.material
+    item.color = own.color
+  }
+  withOrnamentLook(item, cell.item)
+  return { ...cell, item }
+}
+
+/** The ornament donor's icon (same index, same key rule) and its game look, onto the view. */
+function withOrnamentLook(item: SheetItemView, source: SheetItem): void {
+  if (source.ornament === undefined) return
+  const record = itemIndex().get(itemKey(source.ornament))
+  if (record?.iconId !== undefined) item.ornamentIconId = record.iconId
+  const look = source.ornamentId === undefined ? undefined : itemModels().byId[String(source.ornamentId)]
+  if (!look) return
+  if (look.model !== '') item.ornamentModel = look.model
+  item.ornamentMaterial = look.material
+  item.ornamentColor = look.color
+}
+
+/**
+ * A joined cell, as the gear sum reads it: the DB's block and the ` +N` the dump's name stated.
+ *
+ * BOTH HALVES, ALWAYS (JOS-416). The tier travels with the block because `sumGear` scales by it —
+ * this handler states what is worn and at what level, and the shared fold owns the arithmetic. An
+ * empty cell or an item the corpus does not know contributes no block; the sum counts it.
+ */
+function wornOf(cell: SheetCellView): WornItemBlock {
+  if (!cell.item) return {}
+  // ONE LOOKUP PER ITEM: `joinCell` already asked the corpus and wrote the answer onto the view,
+  // so the sum reads the same object the card's hover will - a second `itemIndex()` call here
+  // would be a second chance for the two to disagree.
+  return { tier: cell.item.tier, block: cell.item.block }
+}
+
+/**
+ * THE SHEET, BUILT. Exported since the phone link (docs/plans/phone-link.md): main is the side that
+ * holds the item corpus, so main is the side that can build a character profile for the phone's
+ * Character tab, and it must build it the SAME WAY the Character tab is built or the two would
+ * describe one character two ways. One function, two callers - this handler and
+ * `src/main/phone/snapshots.ts` - rather than a second join over the same 8.6 MB index.
+ *
+ * NOT CACHED, for the reason in the header: the dump is a file the player rewrites mid-session on
+ * purpose, and a cache would hand a caller the answer from before they typed the command.
+ */
+export function buildCharacterSheet(): CharacterSheet | null {
+  const character = getActiveCharacter()
+  const loaded = loadInventoryDump(character?.name, character?.server)
+  if (!loaded) return null
+
+  const { cells, unplaced } = sheetCells(loaded.dump)
+  const joined = cells.map(joinCell)
+  const joinedUnplaced = unplaced.map(joinCell)
+  // Only the cells that hold something feed the sum — an empty slot is not an unknown item.
+  const worn = [...joined, ...joinedUnplaced].filter((c) => c.item !== null)
+
+  return {
+    path: loaded.path,
+    loadedAt: loaded.loadedAt,
+    cells: joined,
+    unplaced: joinedUnplaced,
+    totals: sumGear(worn.map(wornOf)),
+    // …and the SAME parse, flattened (JOS-327). No DB join and no second read of the file: the
+    // ledger the carry-all table draws is by construction the same bytes the grid above it drew.
+    carry: carryAll(loaded.dump)
+  }
+}
+
+export function registerCharacterSheetIpc(): void {
+  ipcMain.handle(IPC.characterSheet, (): CharacterSheet | null => buildCharacterSheet())
+}
