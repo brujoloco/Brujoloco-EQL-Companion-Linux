@@ -4,9 +4,17 @@ A native Linux 📦 **AppImage** companion for **EverQuest Legends**. It reads t
 already writes and turns it into live views: a DPS meter ⚔️, floating overlays, Plane of Sky quest
 tracking 🌤️, loot and item knowledge, XP/AA progress, raid-target history, buff timers ⏳, and
 sound alerts.
+<p align="center">
+<img src="screenshots/app-01.png" alt="Brujoloco EQL Companion">
+</p>
+
 
 **It only reads your log.** 🛡️ Nothing is injected into EverQuest, no game files are touched, no
 memory is read, nothing is automated — it just watches the log the game already writes.
+<p align="center">
+<img src="screenshots/app-02.png" alt="Brujoloco EQL Companion">
+</p>
+
 
 ## ✨ What's new in this fork
 
@@ -16,9 +24,17 @@ the game, and an adaptive light/dark mode that flips so every submenu stays read
 floating overlay windows (your meters, the event log, the buff bars, all twelve of them) follow
 the main theme now, so a colour swap recolours them too. Every theme is checked against WCAG-AA
 contrast so the text stays legible at any palette you pick. 🎨
+<p align="center">
+<img src="screenshots/app-03.png" alt="Brujoloco EQL Companion">
+</p>
+
 
 The full list of what was added and changed also lives **inside the app** — open **Preferences →
 What's new** and read the `0.1.0` entry for the whole story. 📜
+<p align="center">
+<img src="screenshots/app-04.png" alt="Brujoloco EQL Companion">
+</p>
+
 
 ## 🔧 Origin
 
@@ -26,6 +42,10 @@ This is a **private fork** of [EQ Zera](https://github.com/Zeratfule/EQ-Zera), w
 fork of [everquest-companion](https://github.com/jmoyers/everquest-companion) ("EQ Legends
 Companion") by Josh Moyers. I reworked it for my own Linux box — a native AppImage instead of a
 Windows installer — and added a few things on top. 🐧→📦
+<p align="center">
+<img src="screenshots/app-05.png" alt="Brujoloco EQL Companion">
+</p>
+
 
 ## 📜 License
 
@@ -39,3 +59,10 @@ About-this-build section) are released under the **MIT License**, © 2026 Brujol
 [`NOTICE`](NOTICE) for the full grant and the third-party and bundled-asset attributions. This
 build is declared **final** as a delivered product for Linux; everyone is free to use, copy,
 modify, fork, and redistribute it under those terms.
+<p align="center">
+<img src="screenshots/app-06.png" alt="Brujoloco EQL Companion">
+</p>
+
+<p align="center">
+<img src="screenshots/app-07.png" alt="Brujoloco EQL Companion">
+</p>
